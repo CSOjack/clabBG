@@ -903,7 +903,7 @@
                         <input type="number" id="base-fx-rate" placeholder="1380" step="0.01">
                         <div class="form-hint">
                             📌 <strong>Always use the "Send (TT Selling)" rate, not the mid-market rate.</strong><br>
-                            This is the actual rate applied when remitting payment to your overseas supplier — it is slightly higher than the mid-market rate.<br>
+                            This is the actual rate applied when remitting payment — slightly higher than the mid-market rate.<br>
                             <a href="https://finance.naver.com/marketindex/" target="_blank" rel="noopener"
                                style="color:#2b6cb0;font-weight:600;text-decoration:underline;">
                                🔗 Check Naver FX rate →
@@ -944,7 +944,7 @@
                         <div class="form-group">
                             <label for="duty-rate">HS Code Duty Rate %</label>
                             <input type="number" id="duty-rate" placeholder="8" step="0.01" value="8">
-                            <div class="form-hint">Korean import duty rate. Common rates: Food/health supplements ~8%, Cosmetics ~6.5% (varies by HS code). <a href="https://www.customs.go.kr/ftaportalkor/main.do" target="_blank" rel="noopener" style="color:#2b6cb0;">Korea Customs →</a></div>
+                            <div class="form-hint">Korean import duty rate. Common rates: Food/health supplements ~8%, Cosmetics ~6.5%. <a href="https://www.customs.go.kr/ftaportalkor/main.do" target="_blank" rel="noopener" style="color:#2b6cb0;">Korea Customs →</a></div>
                         </div>
                         <div class="form-group">
                             <label for="vat-rate">VAT Rate %</label>
@@ -1024,11 +1024,11 @@
                 <div class="section-title">Part A: Channel Selection</div>
                 <div class="info-box">
                     <strong>📊 What are GP% (Retailer Margin) and Trade% (Commercial Conditions)?</strong><br>
-                    <strong>GP%</strong> = The retailer's margin as a % of RSP (ex-VAT). This determines the supply price you receive.<br>
-                    <em>Supply Price = RSP ÷ 1.1 (ex-VAT) × (1 − GP%)</em><br>
+                    <strong>GP%</strong> = The retailer's margin as a % of RSP (ex-VAT). Determines the supply price you receive.<br>
+                    <em>Supply Price = RSP ÷ 1.1 (ex-VAT) × (1 - GP%)</em><br>
                     <strong>Trade%</strong> = Additional commercial conditions beyond GP% (e.g., promotional support, logistics pass-through).
                     Deducted from supply price and <strong>shown separately in the GM% breakdown</strong>.<br>
-                    <em>※ Selecting a retailer pre-fills industry-standard values — adjust to reflect your actual contract terms</em>
+                    <em>Selecting a retailer pre-fills industry-standard values — adjust to reflect your actual contract terms</em>
                 </div>
 
                 <div id="channel-list-container">
@@ -1042,8 +1042,8 @@
                 <div class="section-title">Part B: SKU Value Chain Parameters</div>
                 <div class="info-box" style="margin-bottom:10px">
                     <strong>💡 TAC (Total Acquisition Cost) Formula</strong><br>
-                    <em>TAC = Landed Cost + Packaging + Labor + Channel Logistics + Other + Vendor Fee − FOC Rebate</em><br>
-                    <strong>Logistics</strong>: % of supply price or fixed ₩ (logistics charged by channel, e.g., Coupang Rocket) |
+                    <em>TAC = Landed Cost x Sell Pack + Packaging + Labor + Channel Logistics + Other + Vendor Fee - FOC Rebate</em><br>
+                    <strong>Logistics</strong>: % of supply price or fixed KRW (channel-charged logistics, e.g., Coupang Rocket) |
                     <strong>Vendor Fee%</strong>: % of supply price (dealer/agent commission) |
                     <strong>FOC%</strong>: Free-of-charge rebate as % of Mfg Supply Price (cost deduction)
                 </div>
@@ -1051,7 +1051,7 @@
                     <button class="btn btn-outline" onclick="importAllFromLC()" style="background:#ebf8ff;border-color:#90cdf4;color:#2b6cb0;font-weight:600">
                         📋 Auto-import SKUs from Landed Cost
                     </button>
-                    <span style="font-size:11px;color:#718096;margin-left:8px">← Bulk-import all SKUs calculated in Step 2</span>
+                    <span style="font-size:11px;color:#718096;margin-left:8px"><- Bulk-import all SKUs calculated in Step 2</span>
                 </div>
 
                 <div class="summary-table">
@@ -1063,13 +1063,14 @@
                                 <th>SKU Name</th>
                                 <th title="Retail Selling Price (VAT incl.)">RSP (₩)<br><span style="font-weight:400;font-size:9px">Consumer price</span></th>
                                 <th title="Landed Cost per unit (calculated in Step 2)">LC/unit (₩)<br><span style="font-weight:400;font-size:9px">Import cost</span></th>
+                                <th title="Units per selling package. e.g., 8-pack: enter 8. Landed Cost is multiplied accordingly." style="background:#fffbeb;">Sell Pack<br><span style="font-weight:400;font-size:9px">Units/pack</span></th>
                                 <th title="Packaging materials: bottles, boxes, labels etc.">Pkg (₩)<br><span style="font-weight:400;font-size:9px">Packaging</span></th>
                                 <th title="Labor for repacking, labeling, assembly etc.">Labor (₩)<br><span style="font-weight:400;font-size:9px">Labor cost</span></th>
-                                <th title="Channel logistics cost: % of supply price or fixed ₩ (e.g., Coupang Rocket)">Logistics<br><span style="font-weight:400;font-size:9px">Ch. logistics</span></th>
+                                <th title="Channel logistics cost: % of supply or fixed KRW (e.g., Coupang Rocket)">Logistics<br><span style="font-weight:400;font-size:9px">Ch. logistics</span></th>
                                 <th title="Vendor/agent commission as % of supply price">Vendor %<br><span style="font-weight:400;font-size:9px">Agent fee</span></th>
-                                <th title="Other fixed costs per unit (₩)">Other (₩)</th>
-                                <th title="FOC% × Mfg Supply Price = free-of-charge rebate deducted from TAC">FOC %<br><span style="font-weight:400;font-size:9px">Rebate</span></th>
-                                <th title="Manufacturer supply price used for FOC rebate calculation (₩)">Mfg Supply<br><span style="font-weight:400;font-size:9px">Mfg price</span></th>
+                                <th title="Other fixed costs per unit (KRW)">Other (₩)</th>
+                                <th title="FOC% x Mfg Supply Price = free-of-charge rebate deducted from TAC">FOC %<br><span style="font-weight:400;font-size:9px">Rebate</span></th>
+                                <th title="Manufacturer supply price for FOC rebate calculation (KRW)">Mfg Supply<br><span style="font-weight:400;font-size:9px">Mfg price</span></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -1537,6 +1538,19 @@
             renderLCTable();
         }
 
+        function updateEffLCDisplay(row) {
+            const lcVal  = parseFloat(row.querySelector('[data-field="lc-unit"]').value) || 0;
+            const packEl = row.querySelector('[data-field="vc-pack-size"]');
+            const pack   = parseFloat(packEl ? packEl.value : 1) || 1;
+            const dispEl = row.querySelector('[data-field="eff-lc-display"]');
+            if (!dispEl) return;
+            if (lcVal > 0 && pack > 1) {
+                dispEl.textContent = '= ₩' + Math.round(lcVal * pack).toLocaleString() + ' (×' + pack + ')';
+            } else {
+                dispEl.textContent = '';
+            }
+        }
+
         function toggleAncType() {
             const type = (document.getElementById('anc-type') || {}).value || 'pct';
             const rateEl = document.getElementById('ancillary-rate');
@@ -1794,7 +1808,7 @@
             appState.skuParams = lcSkus.map(s => ({
                 skuName: s.productName,
                 lcUnit: s.lcUnit,
-                rsp: 0, packaging: 0, labor: 0, logistics: 0, logType: 'pct', vendor: 0, other: 0, foc: 0, mfgSupply: 0
+                rsp: 0, packaging: 0, labor: 0, logistics: 0, logType: 'pct', vcPackSize: 1, vendor: 0, other: 0, foc: 0, mfgSupply: 0
             }));
             renderSKUTable();
         }
@@ -1820,7 +1834,15 @@
                     </td>
                     <td><input type="text" data-field="sku-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
                     <td><input type="number" data-field="rsp" placeholder="39900" step="1" style="width:100%;"></td>
-                    <td><input type="number" data-field="lc-unit" placeholder="auto↑" step="1" style="width:100%;background:#fffbeb;border-color:#f6ad55"></td>
+                    <td><input type="number" data-field="lc-unit" placeholder="auto↑" step="1"
+                        style="width:100%;background:#fffbeb;border-color:#f6ad55"
+                        oninput="updateEffLCDisplay(this.closest('tr'))"></td>
+                    <td style="min-width:72px;background:#fffef0;">
+                        <input type="number" data-field="vc-pack-size" placeholder="1" step="1" value="1" min="1"
+                            style="width:100%;background:#fffef0;border-color:#f6e05e;"
+                            oninput="updateEffLCDisplay(this.closest('tr'))">
+                        <div data-field="eff-lc-display" style="font-size:10px;color:#2b6cb0;font-weight:600;margin-top:2px;white-space:nowrap;"></div>
+                    </td>
                     <td><input type="number" data-field="packaging" placeholder="0" step="1" value="0" style="width:100%;"></td>
                     <td><input type="number" data-field="labor" placeholder="0" step="1" value="0" style="width:100%;"></td>
                     <td style="min-width:80px;">
@@ -1841,6 +1863,8 @@
                 if (sku.skuName) row.querySelector('[data-field="sku-name"]').value = sku.skuName;
                 if (sku.rsp) row.querySelector('[data-field="rsp"]').value = sku.rsp;
                 if (sku.lcUnit) row.querySelector('[data-field="lc-unit"]').value = sku.lcUnit;
+                if (sku.vcPackSize && sku.vcPackSize > 1) row.querySelector('[data-field="vc-pack-size"]').value = sku.vcPackSize;
+                updateEffLCDisplay(row);
                 if (sku.packaging) row.querySelector('[data-field="packaging"]').value = sku.packaging;
                 if (sku.labor) row.querySelector('[data-field="labor"]').value = sku.labor;
                 if (sku.logistics) row.querySelector('[data-field="logistics"]').value = sku.logistics;
@@ -1868,6 +1892,7 @@
                 skuName: row.querySelector('[data-field="sku-name"]').value,
                 rsp: parseFloat(row.querySelector('[data-field="rsp"]').value) || 0,
                 lcUnit: parseFloat(row.querySelector('[data-field="lc-unit"]').value) || 0,
+                vcPackSize: parseFloat(row.querySelector('[data-field="vc-pack-size"]').value) || 1,
                 packaging: parseFloat(row.querySelector('[data-field="packaging"]').value) || 0,
                 labor: parseFloat(row.querySelector('[data-field="labor"]').value) || 0,
                 logistics: parseFloat(row.querySelector('[data-field="logistics"]').value) || 0,
@@ -1934,10 +1959,13 @@
                     const chLogRate = channel.logistics / 100;
                     const supplyPrice = Math.round(rspExVat * (1 - channel.gp / 100 - chLogRate));
 
+                    const vcPack = sku.vcPackSize || 1;
+                    const effectiveLcUnit = Math.round(sku.lcUnit * vcPack);  // multiply LC by sell pack quantity
+
                     const logAmt = sku.logType === 'fixed' ? sku.logistics : supplyPrice * (sku.logistics / 100);
                     const vendorAmt = supplyPrice * (sku.vendor / 100);
                     const focAmt = sku.mfgSupply * (sku.foc / 100);
-                    const tac = Math.round(sku.lcUnit + sku.packaging + sku.labor + logAmt + sku.other + vendorAmt - focAmt);
+                    const tac = Math.round(effectiveLcUnit + sku.packaging + sku.labor + logAmt + sku.other + vendorAmt - focAmt);
 
                     const grossRevenue = supplyPrice - tac;
                     const gm = supplyPrice > 0 ? (grossRevenue / supplyPrice) * 100 : 0;
@@ -1962,7 +1990,9 @@
                         logInput: sku.logistics,
                         vendorAmt: Math.round(vendorAmt),
                         focAmt: Math.round(focAmt),
-                        lcUnit: sku.lcUnit,
+                        lcUnit: effectiveLcUnit,
+                        lcUnitRaw: sku.lcUnit,
+                        vcPack,
                         packaging: sku.packaging,
                         labor: sku.labor,
                         other: sku.other,
@@ -1981,7 +2011,7 @@
 
                         const promoLogAmt = sku.logType === 'fixed' ? sku.logistics : promoSupply * (sku.logistics / 100);
                         const promoVendorAmt = promoSupply * (sku.vendor / 100);
-                        const promoTac = Math.round(sku.lcUnit + sku.packaging + sku.labor + promoLogAmt + sku.other + promoVendorAmt - focAmt);
+                        const promoTac = Math.round(effectiveLcUnit + sku.packaging + sku.labor + promoLogAmt + sku.other + promoVendorAmt - focAmt);
 
                         const promoRevenue = promoSupply - promoTac;
                         const promoGm = promoSupply > 0 ? (promoRevenue / promoSupply) * 100 : 0;
@@ -2006,7 +2036,9 @@
                             logInput: sku.logistics,
                             vendorAmt: Math.round(promoVendorAmt),
                             focAmt: Math.round(focAmt),
-                            lcUnit: sku.lcUnit,
+                            lcUnit: effectiveLcUnit,
+                            lcUnitRaw: sku.lcUnit,
+                            vcPack,
                             packaging: sku.packaging,
                             labor: sku.labor,
                             other: sku.other,
@@ -2087,7 +2119,7 @@
                         <div class="sku-result-column">
                             <div class="sku-result-column-title">Cost Side / TAC</div>
                             <div class="sku-result-line">
-                                <span>Landed Cost</span>
+                                <span>Landed Cost${res.vcPack > 1 ? ` <span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 4px;">×${res.vcPack}</span>` : ''}</span>
                                 <span class="sku-result-line-value">₩${res.lcUnit.toLocaleString()}</span>
                             </div>
                             <div class="sku-result-line">
@@ -2154,7 +2186,7 @@
                     <td>${res.skuName}</td>
                     <td class="text-right">₩${res.rsp.toLocaleString()}</td>
                     <td class="text-right">₩${res.supplyPrice.toLocaleString()}</td>
-                    <td class="text-right">₩${res.lcUnit.toLocaleString()}</td>
+                    <td class="text-right">₩${res.lcUnit.toLocaleString()}${res.vcPack > 1 ? `<br><span style="font-size:9px;color:#92400e;">(×${res.vcPack})</span>` : ''}</td>
                     <td class="text-right">₩${res.tac.toLocaleString()}</td>
                     <td class="text-right">₩${res.grossRevenue.toLocaleString()}</td>
                     <td class="text-right">${res.gm.toFixed(2)}%</td>
