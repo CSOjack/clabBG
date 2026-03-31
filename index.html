@@ -587,36 +587,185 @@
         }
 
         /* Print Styles */
+        /* ── Print / PDF — A4 Friendly ──────────────────────────────── */
+        .print-only { display: none; }
+
         @media print {
-            body {
-                background: white;
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm 1.8cm 1.5cm 1.8cm;
             }
 
-            .header {
-                page-break-after: avoid;
+            /* ── Reset & base ── */
+            *, *::before, *::after { box-sizing: border-box; }
+            html, body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                font-size: 10.5pt !important;
+                font-family: 'Segoe UI', 'Calibri', Arial, sans-serif !important;
+                color: #1a202c !important;
             }
 
+            /* ── Hide everything except results ── */
+            .header,
             .step-indicator,
             .nav-buttons,
             .btn-group,
-            .btn {
-                display: none !important;
+            .btn,
+            #step-1, #step-2, #step-3, #step-4,
+            .footer { display: none !important; }
+
+            /* ── Show print-only header ── */
+            .print-only { display: block !important; }
+
+            /* ── Step 5 (results) — always show in print ── */
+            #step-5 {
+                display: block !important;
+                padding: 0 !important;
             }
 
-            .card,
+            /* ── Cards ── */
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e0 !important;
+                border-radius: 6px !important;
+                margin-bottom: 10pt !important;
+                padding: 10pt 12pt !important;
+                page-break-inside: avoid;
+            }
+            .card-title {
+                font-size: 11pt !important;
+                padding-bottom: 6pt !important;
+                margin-bottom: 10pt !important;
+            }
+
+            /* ── Result banner & meta ── */
+            .result-banner {
+                background: #1a365d !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border-radius: 6px !important;
+                padding: 7pt 10pt !important;
+                font-size: 9.5pt !important;
+                margin-bottom: 8pt !important;
+            }
+
+            /* ── SKU result cards ── */
             .sku-result {
-                box-shadow: none;
-                border: 1px solid #e2e8f0;
+                box-shadow: none !important;
+                border: 1.5px solid #2b6cb0 !important;
+                border-radius: 8px !important;
+                margin-bottom: 10pt !important;
                 page-break-inside: avoid;
+                overflow: hidden;
+            }
+            .sku-result-header {
+                background: #1a365d !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                padding: 7pt 10pt !important;
+                font-size: 10.5pt !important;
+            }
+            .sku-result-body {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 140pt !important;
+            }
+            .sku-result-column {
+                padding: 7pt 8pt !important;
+                border-right: 1px solid #e2e8f0 !important;
+            }
+            .sku-result-column:last-child { border-right: none !important; }
+            .sku-result-column-title {
+                font-size: 8pt !important;
+                font-weight: 700 !important;
+                margin-bottom: 5pt !important;
+            }
+            .sku-result-line {
+                font-size: 9pt !important;
+                padding: 2pt 0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+            }
+            .sku-result-total {
+                font-size: 9.5pt !important;
+                font-weight: 700 !important;
+                border-top: 1pt solid #cbd5e0 !important;
+                padding-top: 3pt !important;
+                margin-top: 2pt !important;
+            }
+            .sku-result-divider { border-top: 1px dashed #cbd5e0; margin: 3pt 0; }
+
+            /* ── GM Box (dark column) ── */
+            .gm-box {
+                background: #1a365d !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                padding: 10pt 8pt !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                gap: 4pt !important;
+            }
+            .gm-box-label {
+                font-size: 7.5pt !important;
+                color: #90cdf4 !important;
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+            }
+            .gm-box-value {
+                font-size: 22pt !important;
+                font-weight: 700 !important;
+                color: #ffd700 !important;
+            }
+            .gm-box-subtitle {
+                font-size: 8.5pt !important;
+                color: #bee3f8 !important;
             }
 
-            table {
-                page-break-inside: avoid;
+            /* ── Promo card ── */
+            .sku-result.sku-result-promo {
+                border-color: #c53030 !important;
+            }
+            .sku-result.sku-result-promo .sku-result-header {
+                background: #c53030 !important;
+            }
+            .sku-result.sku-result-promo .gm-box {
+                background: #c53030 !important;
             }
 
-            .footer {
-                border-top: 1px solid #e2e8f0;
+            /* ── Summary table ── */
+            .summary-table {
+                page-break-inside: auto !important;
+                overflow: visible !important;
             }
+            .summary-table table {
+                width: 100% !important;
+                min-width: 0 !important;
+                font-size: 8.5pt !important;
+                border-collapse: collapse;
+            }
+            .summary-table th, .summary-table td {
+                padding: 4pt 5pt !important;
+                border: 0.5pt solid #cbd5e0 !important;
+                font-size: 8.5pt !important;
+            }
+            .summary-table th {
+                background: #2d3748 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .summary-table tr { page-break-inside: avoid; }
+
+            /* ── Info/warning boxes: hide in print (no-print) ── */
+            .info-box, .warning-box { display: none !important; }
+
+            /* ── Misc ── */
+            a { color: inherit !important; text-decoration: none !important; }
+            .hidden { display: none !important; }
         }
 
         /* Summary table */
@@ -709,6 +858,12 @@
 
             <div class="section">
                 <div class="section-title">Section A: Import Cost Parameters (Shared)</div>
+                <div class="info-box" style="margin-bottom:14px">
+                    <strong>📦 What is Landed Cost?</strong><br>
+                    Landed Cost is the <strong>total per-unit cost</strong> to bring goods from an overseas supplier to a Korean warehouse.<br>
+                    It sums: FOB price (ex-factory/ship) + freight + insurance + import duty + ancillary clearance costs.
+                    This value becomes the <strong>foundational cost input</strong> for the Value Chain (TAC) analysis in Step 3.
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -733,7 +888,12 @@
                             <option value="DAP">DAP</option>
                             <option value="DDP">DDP</option>
                         </select>
-                        <div class="form-hint">Choose your pricing basis</div>
+                        <div class="form-hint">
+                            Trade terms for international pricing.<br>
+                            <strong>FOB</strong>: Seller bears costs to vessel loading — most common |
+                            <strong>CIF</strong>: Freight + insurance included (skip freight input) |
+                            <strong>DDP</strong>: Duties + VAT pre-paid by seller (skip duty input)
+                        </div>
                     </div>
                 </div>
 
@@ -741,12 +901,20 @@
                     <div class="form-group">
                         <label for="base-fx-rate">Base FX Rate (KRW per <span id="fx-currency">USD</span>)</label>
                         <input type="number" id="base-fx-rate" placeholder="1380" step="0.01">
-                        <div class="form-hint">Current market rate</div>
+                        <div class="form-hint">
+                            📌 <strong>Always use the "Send (TT Selling)" rate, not the mid-market rate.</strong><br>
+                            This is the actual rate applied when remitting payment to your overseas supplier — it is slightly higher than the mid-market rate.<br>
+                            <a href="https://finance.naver.com/marketindex/" target="_blank" rel="noopener"
+                               style="color:#2b6cb0;font-weight:600;text-decoration:underline;">
+                               🔗 Check Naver FX rate →
+                            </a>
+                            &nbsp;(FX tab → select your currency → enter <strong>"Send (TT Selling)"</strong> rate)
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="fx-spread">FX Spread %</label>
+                        <label for="fx-spread">FX Spread % <span style="font-weight:400;font-size:11px;color:#718096">(optional bank markup)</span></label>
                         <input type="number" id="fx-spread" placeholder="0" step="0.01" value="0">
-                        <div class="form-hint">Bank fee/spread applied to FX</div>
+                        <div class="form-hint">Enter any additional bank spread or FX markup (typically 0–1.5%). Enter 0 if you already used the Naver TT Selling rate.</div>
                     </div>
                 </div>
 
@@ -776,6 +944,7 @@
                         <div class="form-group">
                             <label for="duty-rate">HS Code Duty Rate %</label>
                             <input type="number" id="duty-rate" placeholder="8" step="0.01" value="8">
+                            <div class="form-hint">Korean import duty rate. Common rates: Food/health supplements ~8%, Cosmetics ~6.5% (varies by HS code). <a href="https://www.customs.go.kr/ftaportalkor/main.do" target="_blank" rel="noopener" style="color:#2b6cb0;">Korea Customs →</a></div>
                         </div>
                         <div class="form-group">
                             <label for="vat-rate">VAT Rate %</label>
@@ -786,9 +955,16 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="ancillary-rate">Ancillary Cost Rate %</label>
+                        <label for="ancillary-rate">Ancillary Cost &nbsp;
+                            <select id="anc-type" onchange="toggleAncType()" style="margin-left:4px;font-size:12px;border:1px solid #cbd5e0;border-radius:4px;padding:2px 6px;background:#fff;cursor:pointer;">
+                                <option value="pct">% of CIF</option>
+                                <option value="fixed">Fixed ₩</option>
+                            </select>
+                        </label>
                         <input type="number" id="ancillary-rate" placeholder="3" step="0.01" value="3">
-                        <div class="form-hint">Customs broker, trucking, inspection, etc.</div>
+                        <input type="number" id="ancillary-fixed" placeholder="50000" step="100" value="0" style="display:none;">
+                        <div class="form-hint" id="anc-hint-pct">Ancillary costs as % of CIF. Includes: customs brokerage fee, port/transport charges, inspection fees. Typically 2–4%.</div>
+                        <div class="form-hint" id="anc-hint-fixed" style="display:none;">Total ancillary cost as a fixed ₩ amount. Divided by order quantity to allocate per unit. (e.g., flat brokerage fee of ₩50,000)</div>
                     </div>
                     <div class="form-group">
                         <label for="order-qty">Order Quantity (units)</label>
@@ -846,7 +1022,14 @@
 
             <div class="section">
                 <div class="section-title">Part A: Channel Selection</div>
-                <div class="info-box">Select one or more retail channels. You can customize GP% for each.</div>
+                <div class="info-box">
+                    <strong>📊 What are GP% (Retailer Margin) and Trade% (Commercial Conditions)?</strong><br>
+                    <strong>GP%</strong> = The retailer's margin as a % of RSP (ex-VAT). This determines the supply price you receive.<br>
+                    <em>Supply Price = RSP ÷ 1.1 (ex-VAT) × (1 − GP%)</em><br>
+                    <strong>Trade%</strong> = Additional commercial conditions beyond GP% (e.g., promotional support, logistics pass-through).
+                    Deducted from supply price and <strong>shown separately in the GM% breakdown</strong>.<br>
+                    <em>※ Selecting a retailer pre-fills industry-standard values — adjust to reflect your actual contract terms</em>
+                </div>
 
                 <div id="channel-list-container">
                     <!-- Dynamically populated -->
@@ -857,22 +1040,36 @@
 
             <div class="section">
                 <div class="section-title">Part B: SKU Value Chain Parameters</div>
+                <div class="info-box" style="margin-bottom:10px">
+                    <strong>💡 TAC (Total Acquisition Cost) Formula</strong><br>
+                    <em>TAC = Landed Cost + Packaging + Labor + Channel Logistics + Other + Vendor Fee − FOC Rebate</em><br>
+                    <strong>Logistics</strong>: % of supply price or fixed ₩ (logistics charged by channel, e.g., Coupang Rocket) |
+                    <strong>Vendor Fee%</strong>: % of supply price (dealer/agent commission) |
+                    <strong>FOC%</strong>: Free-of-charge rebate as % of Mfg Supply Price (cost deduction)
+                </div>
+                <div id="lc-import-bar" style="margin-bottom:8px;display:none">
+                    <button class="btn btn-outline" onclick="importAllFromLC()" style="background:#ebf8ff;border-color:#90cdf4;color:#2b6cb0;font-weight:600">
+                        📋 Auto-import SKUs from Landed Cost
+                    </button>
+                    <span style="font-size:11px;color:#718096;margin-left:8px">← Bulk-import all SKUs calculated in Step 2</span>
+                </div>
 
                 <div class="summary-table">
                     <table id="sku-table">
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th title="← Import from LC">← LC SKU</th>
                                 <th>SKU Name</th>
-                                <th>RSP (₩)</th>
-                                <th>LC/unit (₩)</th>
-                                <th>Packaging (₩)</th>
-                                <th>Labor (₩)</th>
-                                <th>Logistics %</th>
-                                <th>Vendor Fee %</th>
-                                <th>Other (₩)</th>
-                                <th>FOC %</th>
-                                <th>Mfg Supply (₩)</th>
+                                <th title="Retail Selling Price (VAT incl.)">RSP (₩)<br><span style="font-weight:400;font-size:9px">Consumer price</span></th>
+                                <th title="Landed Cost per unit (calculated in Step 2)">LC/unit (₩)<br><span style="font-weight:400;font-size:9px">Import cost</span></th>
+                                <th title="Packaging materials: bottles, boxes, labels etc.">Pkg (₩)<br><span style="font-weight:400;font-size:9px">Packaging</span></th>
+                                <th title="Labor for repacking, labeling, assembly etc.">Labor (₩)<br><span style="font-weight:400;font-size:9px">Labor cost</span></th>
+                                <th title="Channel logistics cost: % of supply price or fixed ₩ (e.g., Coupang Rocket)">Logistics<br><span style="font-weight:400;font-size:9px">Ch. logistics</span></th>
+                                <th title="Vendor/agent commission as % of supply price">Vendor %<br><span style="font-weight:400;font-size:9px">Agent fee</span></th>
+                                <th title="Other fixed costs per unit (₩)">Other (₩)</th>
+                                <th title="FOC% × Mfg Supply Price = free-of-charge rebate deducted from TAC">FOC %<br><span style="font-weight:400;font-size:9px">Rebate</span></th>
+                                <th title="Manufacturer supply price used for FOC rebate calculation (₩)">Mfg Supply<br><span style="font-weight:400;font-size:9px">Mfg price</span></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -952,6 +1149,19 @@
 
     <!-- Step 5: Results -->
     <div class="step-content" id="step-5">
+        <!-- Print-only header — hidden on screen, visible when printing -->
+        <div class="print-only" id="print-header-box" style="
+            border:2px solid #1a365d;border-radius:8px;padding:10pt 14pt;margin-bottom:12pt;
+            display:flex;justify-content:space-between;align-items:center">
+            <div>
+                <div style="font-size:14pt;font-weight:800;color:#1a365d">Korea Retail Channel Value Chain Analyzer</div>
+                <div id="print-meta" style="font-size:9pt;color:#4a5568;margin-top:3pt"></div>
+            </div>
+            <div style="text-align:right;font-size:8.5pt;color:#718096">
+                Built by <strong>Jacky J. Son</strong> · CSO<br>© Cinnamon Lab
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-title">Step 5: Analysis Results</div>
 
@@ -1085,6 +1295,13 @@
             if (step > getCurrentStep() && !validateStep(getCurrentStep())) {
                 alert('Please fill in required fields before proceeding.');
                 return;
+            }
+
+            // When entering Step 3: sync LC state first so the dropdown has fresh options
+            if (step === 3) {
+                collectLCRowValues();
+                updateLCCalculations();
+                renderSKUTable();  // rebuilds dropdown with latest LC SKUs
             }
 
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
@@ -1320,6 +1537,19 @@
             renderLCTable();
         }
 
+        function toggleAncType() {
+            const type = (document.getElementById('anc-type') || {}).value || 'pct';
+            const rateEl = document.getElementById('ancillary-rate');
+            const fixedEl = document.getElementById('ancillary-fixed');
+            const hintPct = document.getElementById('anc-hint-pct');
+            const hintFixed = document.getElementById('anc-hint-fixed');
+            if (rateEl) rateEl.style.display = type === 'pct' ? '' : 'none';
+            if (fixedEl) fixedEl.style.display = type === 'fixed' ? '' : 'none';
+            if (hintPct) hintPct.style.display = type === 'pct' ? '' : 'none';
+            if (hintFixed) hintFixed.style.display = type === 'fixed' ? '' : 'none';
+            updateLCCalculations();
+        }
+
         function updateLCCalculations() {
             const curr = document.getElementById('product-currency').value;
             const baseFX = parseFloat(document.getElementById('base-fx-rate').value) || FX_DEFAULTS[curr];
@@ -1334,7 +1564,9 @@
             const orderQty = parseFloat(document.getElementById('order-qty').value) || 1;
             const dutyRate = parseFloat(document.getElementById('duty-rate').value) || 0;
             const vatRate = parseFloat(document.getElementById('vat-rate').value) || 10;
-            const ancRate = parseFloat(document.getElementById('ancillary-rate').value) || 0;
+            const ancType = (document.getElementById('anc-type') || {}).value || 'pct';
+            const ancRate = ancType === 'pct' ? (parseFloat(document.getElementById('ancillary-rate').value) || 0) : 0;
+            const ancFixed = ancType === 'fixed' ? (parseFloat(document.getElementById('ancillary-fixed').value) || 0) : 0;
 
             const rows = document.querySelectorAll('#lc-tbody tr');
             rows.forEach((row, idx) => {
@@ -1346,7 +1578,7 @@
                 const fobUnitKRW = fobPrice * effectiveFX;
                 const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
                 const dutyUnit = cifUnit * (dutyRate / 100);
-                const ancUnit = cifUnit * (ancRate / 100);
+                const ancUnit = ancType === 'fixed' ? (ancFixed / orderQty) : cifUnit * (ancRate / 100);
                 const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
                 const lcPack = Math.round(lcExVat * packSize);
 
@@ -1369,7 +1601,7 @@
                 const fobUnitKRW = fobPrice * effectiveFX;
                 const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
                 const dutyUnit = cifUnit * (dutyRate / 100);
-                const ancUnit = cifUnit * (ancRate / 100);
+                const ancUnit = ancType === 'fixed' ? (ancFixed / orderQty) : cifUnit * (ancRate / 100);
                 const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
                 const lcIncVat = Math.round(lcExVat * (1 + vatRate / 100));
 
@@ -1401,7 +1633,7 @@
                             <div class="waterfall-arrow">↓</div>
                         </div>
                         <div class="waterfall-row">
-                            <div class="waterfall-label">+ Ancillary Cost (${ancRate}%)</div>
+                            <div class="waterfall-label">+ Ancillary Cost (${ancType === 'fixed' ? '₩ Fixed' : ancRate + '%'})</div>
                             <div class="waterfall-value">₩${Math.round(ancUnit).toLocaleString()}</div>
                             <div class="waterfall-arrow">↓</div>
                         </div>
@@ -1536,19 +1768,68 @@
             renderChannelSelection();
         }
 
+        function buildLCDropdownOptions(selectedName) {
+            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
+            if (!lcSkus.length) return '<option value="">— (No LC data in Step 2) —</option>';
+            let opts = '<option value="">— Select —</option>';
+            lcSkus.forEach(s => {
+                const sel = s.productName === selectedName ? ' selected' : '';
+                opts += `<option value="${s.productName}"${sel}>${s.productName} (LC ₩${s.lcUnit.toLocaleString()})</option>`;
+            });
+            return opts;
+        }
+
+        function applyLCtoSKURow(row, productName) {
+            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
+            const found = lcSkus.find(s => s.productName === productName);
+            if (!found) return;
+            row.querySelector('[data-field="sku-name"]').value = found.productName;
+            row.querySelector('[data-field="lc-unit"]').value = found.lcUnit;
+        }
+
+        function importAllFromLC() {
+            // appState.landedCost.skus is already up-to-date (synced in goToStep(3))
+            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
+            if (!lcSkus.length) { alert('Please enter SKU details and FOB prices in Step 2 to calculate Landed Cost first.'); return; }
+            appState.skuParams = lcSkus.map(s => ({
+                skuName: s.productName,
+                lcUnit: s.lcUnit,
+                rsp: 0, packaging: 0, labor: 0, logistics: 0, logType: 'pct', vendor: 0, other: 0, foc: 0, mfgSupply: 0
+            }));
+            renderSKUTable();
+        }
+
         function renderSKUTable() {
             const tbody = document.getElementById('sku-tbody');
             tbody.innerHTML = '';
+
+            // Show/hide the LC import bar based on whether LC SKUs exist
+            const lcBar = document.getElementById('lc-import-bar');
+            const hasLC = appState.landedCost.skus.some(s => s.productName && s.lcUnit > 0);
+            if (lcBar) lcBar.style.display = hasLC ? 'block' : 'none';
+
             appState.skuParams.forEach((sku, idx) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="text-center">${idx + 1}</td>
+                    <td>
+                      <select data-field="lc-select" onchange="applyLCtoSKURow(this.closest('tr'), this.value)"
+                        style="width:100%;font-size:11px;padding:4px 4px;border:1px solid #bfdbfe;border-radius:5px;background:#f0f8ff;color:#1e40af;cursor:pointer">
+                        ${buildLCDropdownOptions(sku.skuName)}
+                      </select>
+                    </td>
                     <td><input type="text" data-field="sku-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
                     <td><input type="number" data-field="rsp" placeholder="39900" step="1" style="width:100%;"></td>
-                    <td><input type="number" data-field="lc-unit" placeholder="5800" step="1" style="width:100%;"></td>
-                    <td><input type="number" data-field="packaging" placeholder="500" step="1" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="labor" placeholder="300" step="1" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="logistics" placeholder="3" step="0.01" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="lc-unit" placeholder="auto↑" step="1" style="width:100%;background:#fffbeb;border-color:#f6ad55"></td>
+                    <td><input type="number" data-field="packaging" placeholder="0" step="1" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="labor" placeholder="0" step="1" value="0" style="width:100%;"></td>
+                    <td style="min-width:80px;">
+                        <select data-field="log-type" style="width:100%;font-size:11px;margin-bottom:3px;border:1px solid #cbd5e0;border-radius:4px;padding:2px 4px;background:#fff;">
+                            <option value="pct">% of Supply</option>
+                            <option value="fixed">Fixed ₩</option>
+                        </select>
+                        <input type="number" data-field="logistics" placeholder="0" step="0.01" value="0" style="width:100%;">
+                    </td>
                     <td><input type="number" data-field="vendor" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
                     <td><input type="number" data-field="other" placeholder="0" step="1" value="0" style="width:100%;"></td>
                     <td><input type="number" data-field="foc" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
@@ -1563,6 +1844,7 @@
                 if (sku.packaging) row.querySelector('[data-field="packaging"]').value = sku.packaging;
                 if (sku.labor) row.querySelector('[data-field="labor"]').value = sku.labor;
                 if (sku.logistics) row.querySelector('[data-field="logistics"]').value = sku.logistics;
+                if (sku.logType) row.querySelector('[data-field="log-type"]').value = sku.logType;
                 if (sku.vendor) row.querySelector('[data-field="vendor"]').value = sku.vendor;
                 if (sku.other) row.querySelector('[data-field="other"]').value = sku.other;
                 if (sku.foc) row.querySelector('[data-field="foc"]').value = sku.foc;
@@ -1589,6 +1871,7 @@
                 packaging: parseFloat(row.querySelector('[data-field="packaging"]').value) || 0,
                 labor: parseFloat(row.querySelector('[data-field="labor"]').value) || 0,
                 logistics: parseFloat(row.querySelector('[data-field="logistics"]').value) || 0,
+                logType: row.querySelector('[data-field="log-type"]') ? row.querySelector('[data-field="log-type"]').value : 'pct',
                 vendor: parseFloat(row.querySelector('[data-field="vendor"]').value) || 0,
                 other: parseFloat(row.querySelector('[data-field="other"]').value) || 0,
                 foc: parseFloat(row.querySelector('[data-field="foc"]').value) || 0,
@@ -1651,7 +1934,7 @@
                     const chLogRate = channel.logistics / 100;
                     const supplyPrice = Math.round(rspExVat * (1 - channel.gp / 100 - chLogRate));
 
-                    const logAmt = supplyPrice * (sku.logistics / 100);
+                    const logAmt = sku.logType === 'fixed' ? sku.logistics : supplyPrice * (sku.logistics / 100);
                     const vendorAmt = supplyPrice * (sku.vendor / 100);
                     const focAmt = sku.mfgSupply * (sku.foc / 100);
                     const tac = Math.round(sku.lcUnit + sku.packaging + sku.labor + logAmt + sku.other + vendorAmt - focAmt);
@@ -1675,6 +1958,8 @@
                         chLogRate,
                         gpAmt: Math.round(rspExVat * (channel.gp / 100)),
                         logAmt: Math.round(logAmt),
+                        logType: sku.logType || 'pct',
+                        logInput: sku.logistics,
                         vendorAmt: Math.round(vendorAmt),
                         focAmt: Math.round(focAmt),
                         lcUnit: sku.lcUnit,
@@ -1694,7 +1979,7 @@
                         const ourBurden = totalDisc * (1 - appState.promotion.channelSupportRate / 100);
                         const promoSupply = Math.round(supplyPrice - ourBurden);
 
-                        const promoLogAmt = promoSupply * (sku.logistics / 100);
+                        const promoLogAmt = sku.logType === 'fixed' ? sku.logistics : promoSupply * (sku.logistics / 100);
                         const promoVendorAmt = promoSupply * (sku.vendor / 100);
                         const promoTac = Math.round(sku.lcUnit + sku.packaging + sku.labor + promoLogAmt + sku.other + promoVendorAmt - focAmt);
 
@@ -1717,6 +2002,8 @@
                             chLogRate,
                             gpAmt: Math.round(rspExVat * (channel.gp / 100)),
                             logAmt: Math.round(promoLogAmt),
+                            logType: sku.logType || 'pct',
+                            logInput: sku.logistics,
                             vendorAmt: Math.round(promoVendorAmt),
                             focAmt: Math.round(focAmt),
                             lcUnit: sku.lcUnit,
@@ -1740,12 +2027,18 @@
         function renderResults(results) {
             const channels = appState.channels.map(ch => `${ch.category}: ${ch.retailer}`).join(' | ');
             const headerHTML = `
-                <strong>Date:</strong> ${appState.basicInfo.analysisDate} | 
-                <strong>Brand:</strong> ${appState.basicInfo.brandName} | 
+                <strong>Date:</strong> ${appState.basicInfo.analysisDate} |
+                <strong>Brand:</strong> ${appState.basicInfo.brandName} |
                 <strong>Purpose:</strong> ${appState.basicInfo.analysisPurpose}<br>
                 <strong>Channels:</strong> ${channels}
             `;
             document.getElementById('results-header').innerHTML = headerHTML;
+
+            // Update print-only meta line
+            const printMeta = document.getElementById('print-meta');
+            if (printMeta) {
+                printMeta.innerHTML = `<strong>Brand:</strong> ${appState.basicInfo.brandName} &nbsp;|&nbsp; <strong>Date:</strong> ${appState.basicInfo.analysisDate} &nbsp;|&nbsp; <strong>Channels:</strong> ${channels}`;
+            }
 
             const container = document.getElementById('results-container');
             container.innerHTML = '';
@@ -1807,7 +2100,7 @@
                             </div>
                             ${res.logAmt > 0 ? `
                                 <div class="sku-result-line">
-                                    <span>Logistics (${(res.chLogRate*100).toFixed(1)}%)</span>
+                                    <span>Logistics (${res.logType === 'fixed' ? '₩ Fixed' : res.logInput + '%'})</span>
                                     <span class="sku-result-line-value">₩${res.logAmt.toLocaleString()}</span>
                                 </div>
                             ` : ''}
@@ -1889,7 +2182,9 @@
                     insuranceKRW: document.getElementById('insurance-krw').value,
                     dutyRate: document.getElementById('duty-rate').value,
                     vatRate: document.getElementById('vat-rate').value,
+                    ancType: document.getElementById('anc-type').value,
                     ancRate: document.getElementById('ancillary-rate').value,
+                    ancFixed: document.getElementById('ancillary-fixed').value,
                     orderQty: document.getElementById('order-qty').value,
                     skus: appState.landedCost.skus
                 },
@@ -1934,7 +2229,12 @@
                 document.getElementById('insurance-krw').value = state.landedCost.insuranceKRW || '0';
                 document.getElementById('duty-rate').value = state.landedCost.dutyRate || '8';
                 document.getElementById('vat-rate').value = state.landedCost.vatRate || '10';
+                if (state.landedCost.ancType) {
+                    document.getElementById('anc-type').value = state.landedCost.ancType;
+                    toggleAncType();
+                }
                 document.getElementById('ancillary-rate').value = state.landedCost.ancRate || '3';
+                document.getElementById('ancillary-fixed').value = state.landedCost.ancFixed || '0';
                 document.getElementById('order-qty').value = state.landedCost.orderQty || '3000';
 
                 appState.landedCost.skus = state.landedCost.skus || [];
