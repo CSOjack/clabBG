@@ -1,974 +1,2061 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Value Chain Analysis</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI','Calibri',Arial,sans-serif;background:#eef2f7;min-height:100vh;color:#2d3748}
-.header{background:linear-gradient(135deg,#1a365d 0%,#2c5282 100%);padding:20px 32px 16px;display:flex;align-items:center;gap:18px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.header-icon{font-size:34px}
-.header h1{color:#fff;font-size:21px;font-weight:700}
-.header p{color:#90cdf4;font-size:11px;margin-top:2px}
-.header .built{color:#fbd38d;font-size:11px;margin-top:5px;letter-spacing:.3px}
-.steps{display:flex;justify-content:center;align-items:center;padding:18px 0 6px;background:#f7fafc;border-bottom:1px solid #e2e8f0}
-.step{display:flex;align-items:center}
-.step-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid #cbd5e0;background:#fff;color:#a0aec0;transition:.3s;cursor:pointer}
-.step-dot.active{background:#2b6cb0;border-color:#2b6cb0;color:#fff;box-shadow:0 0 0 4px rgba(43,108,176,.2)}
-.step-dot.done{background:#48bb78;border-color:#48bb78;color:#fff}
-.step-label{font-size:11px;color:#718096;margin-left:6px;white-space:nowrap}
-.step-label.active{color:#2b6cb0;font-weight:700}
-.step-line{width:44px;height:2px;background:#e2e8f0;margin:0 4px}
-.step-line.done{background:#48bb78}
-.container{max-width:1020px;margin:20px auto;padding:0 14px}
-.card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:26px 30px;margin-bottom:14px}
-.card-title{font-size:15px;font-weight:700;color:#1a365d;margin-bottom:18px;padding-bottom:9px;border-bottom:2px solid #ebf4ff;display:flex;align-items:center;gap:8px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
-.form-group{display:flex;flex-direction:column;gap:4px}
-.form-group label{font-size:11px;font-weight:600;color:#4a5568;text-transform:uppercase;letter-spacing:.4px}
-.form-group input,.form-group select{border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;transition:.2s;background:#fafafa}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:#2b6cb0;background:#fff;box-shadow:0 0 0 3px rgba(43,108,176,.12)}
-.hint{font-size:11px;color:#718096;margin-top:3px;display:block;line-height:1.5}
-.info-box{background:#ebf8ff;border-left:4px solid #3182ce;border-radius:6px;padding:11px 15px;font-size:12px;color:#2c5282;line-height:1.8}
-.warn-box{background:#fffbeb;border-left:4px solid #d69e2e;border-radius:6px;padding:11px 15px;font-size:12px;color:#744210;line-height:1.8}
-.channel-box{background:linear-gradient(135deg,#ebf8ff,#e6fffa);border:1.5px solid #81e6d9;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 20px;align-items:end}
-.ch-field{display:flex;flex-direction:column;gap:4px}
-.ch-field label{font-size:11px;font-weight:600;color:#234e52;text-transform:uppercase;letter-spacing:.4px}
-.ch-field input,.ch-field select{border:1.5px solid #81e6d9;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;background:#fff}
-.ch-field input:focus,.ch-field select:focus{outline:none;border-color:#319795;box-shadow:0 0 0 3px rgba(49,151,149,.15)}
-.gp-badge{background:#276749;color:#fff;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;display:inline-block;margin-top:4px}
-.trade-badge{background:#744210;color:#fff;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;display:inline-block;margin-top:4px}
-.sku-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.sku-table{width:100%;border-collapse:collapse;font-size:12px}
-.sku-table th{background:#2b6cb0;color:#fff;padding:8px 6px;text-align:center;font-size:10.5px;white-space:pre-line;line-height:1.3}
-.sku-table td{padding:5px 4px;border-bottom:1px solid #e2e8f0;text-align:center;vertical-align:middle}
-.sku-table tr:hover td{background:#f7fafc}
-.sku-table input{border:1.5px solid #e2e8f0;border-radius:5px;padding:5px 6px;font-size:12px;width:100%;text-align:center;font-family:inherit;background:#fafafa}
-.sku-table input:focus{outline:none;border-color:#2b6cb0;background:#fff}
-.sku-num{font-weight:700;color:#718096;font-size:11px;width:26px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
-.btn-primary{background:#2b6cb0;color:#fff}.btn-primary:hover{background:#2c5282}
-.btn-success{background:#38a169;color:#fff}.btn-success:hover{background:#276749}
-.btn-outline{background:#fff;color:#4a5568;border:1.5px solid #cbd5e0}.btn-outline:hover{background:#f7fafc}
-.btn-sample{background:#e9d8fd;color:#553c9a;border:1.5px solid #b794f4}.btn-sample:hover{background:#d6bcfa}
-.btn-danger{background:#fed7d7;color:#c53030;border:none;border-radius:5px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700}
-.btn-add{background:#ebf8ff;color:#2b6cb0;border:1.5px dashed #90cdf4;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer}
-.btn-add:hover{background:#bee3f8}
-.nav-bar{display:flex;justify-content:space-between;padding:8px 0 3px}
-/* RESULT */
-.result-banner{background:linear-gradient(90deg,#1a365d,#2c5282);color:#fff;border-radius:10px;padding:10px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.meta-chip{background:#ebf4ff;border-radius:8px;padding:9px 12px;text-align:center}
-.meta-chip .v{font-weight:700;color:#1a365d;font-size:14px}
-.meta-chip .k{font-size:10px;color:#718096;margin-top:2px}
-.sku-result{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.sr-header{background:linear-gradient(135deg,#1a365d,#2b6cb0);padding:11px 18px;display:flex;justify-content:space-between;align-items:center}
-.sr-title{font-size:14px;font-weight:700;color:#fff}
-.sr-meta{font-size:10px;color:#90cdf4}
-.sr-body{display:grid;grid-template-columns:1fr 1fr 220px;background:#fff}
-.sr-col{padding:14px 16px;border-right:1px solid #e2e8f0}
-.sr-col:last-child{border-right:none}
-.sr-col-title{font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid #e2e8f0}
-.vc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:4px;font-size:12px}
-.vc-row:nth-child(even){background:#f7fafc}
-.vc-row.vc-total{background:#ebf4ff;font-weight:700;color:#2b6cb0;margin-top:3px}
-.vc-row.vc-sep{border-top:1.5px dashed #e2e8f0;height:1px;padding:0;margin:3px 0;background:transparent}
-.vc-lbl{color:#4a5568}
-.vc-val{font-weight:600;color:#2d3748}
-.gm-box{background:linear-gradient(160deg,#1a365d,#2d4a7a);padding:18px 16px;display:flex;flex-direction:column;justify-content:center;gap:5px}
-.gm-lbl{font-size:9px;color:#90cdf4;text-transform:uppercase;letter-spacing:.6px}
-.gm-val{font-size:28px;font-weight:700;color:#ffd700}
-.gm-sub{font-size:10px;color:#90cdf4}
-.gm-divider{height:1px;background:rgba(255,255,255,.15);margin:6px 0}
-.gm-adj{font-size:11px;color:#fc8181;font-weight:600}
-.summary-table{width:100%;border-collapse:collapse;font-size:11.5px}
-.summary-table th{background:#2d3748;color:#fff;padding:8px 10px;text-align:center}
-.summary-table td{padding:7px 10px;text-align:center;border-bottom:1px solid #e2e8f0}
-.summary-table tr:hover td{background:#f7fafc}
-.hl{font-weight:700;color:#2b6cb0}
-.hl-green{font-weight:700;color:#276749}
-.panel{display:none}.panel.active{display:block}
-.page-footer{text-align:center;padding:20px 0 26px;color:#a0aec0;font-size:11px;line-height:2;border-top:1px solid #e2e8f0;margin-top:16px;background:#f7fafc}
-@media(max-width:700px){.form-grid,.channel-box,.sr-body{grid-template-columns:1fr}.meta-grid{grid-template-columns:1fr 1fr}}
-@media print{.steps,.nav-bar,.btn,.sku-toolbar button,.no-print{display:none!important}.card{box-shadow:none}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korea Channel Analyzer v2</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
+            background: #eef2f7;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        body {
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #718096;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-dot.active {
+            background: #2b6cb0;
+            border-color: #2b6cb0;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(43, 108, 176, 0.1);
+        }
+
+        .step-dot.done {
+            background: #48bb78;
+            border-color: #48bb78;
+            color: white;
+        }
+
+        .step-line {
+            height: 2px;
+            width: 60px;
+            background: #cbd5e0;
+            position: relative;
+            z-index: 1;
+            margin: 0 -8px;
+        }
+
+        .step-line.active {
+            background: #2b6cb0;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 26px 30px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a365d;
+            border-bottom: 2px solid #ebf4ff;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2b6cb0;
+            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* Checkboxes and Radios */
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-item label,
+        .radio-item label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #2b6cb0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a5aa0;
+            box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f8659;
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #2b6cb0;
+            border: 1px solid #2b6cb0;
+        }
+
+        .btn-outline:hover {
+            background: #ebf4ff;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Info and Warning Boxes */
+        .info-box {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 14px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 16px 0;
+            color: #1a365d;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #d69e2e;
+            padding: 14px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 16px 0;
+            color: #7c2d12;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Step Content */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        /* Inline Section */
+        .section {
+            margin-bottom: 28px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* SKU Result Cards */
+        .sku-result {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .sku-result-header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .sku-result-body {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+        }
+
+        .sku-result-column {
+            padding: 20px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .sku-result-column:last-child {
+            border-right: none;
+        }
+
+        .sku-result-column-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .sku-result-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+            color: #2d3748;
+        }
+
+        .sku-result-line-label {
+            font-weight: 500;
+        }
+
+        .sku-result-line-value {
+            font-weight: 600;
+            color: #1a365d;
+        }
+
+        .sku-result-divider {
+            border-top: 2px solid #e2e8f0;
+            margin: 12px 0;
+        }
+
+        .sku-result-total {
+            font-weight: 700;
+            color: #1a365d;
+            font-size: 14px;
+        }
+
+        /* GM Box */
+        .gm-box {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .gm-box-label {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .gm-box-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .gm-box-subtitle {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Promo Result */
+        .sku-result-promo {
+            border: 2px solid #fc8181;
+        }
+
+        .sku-result-promo .sku-result-header {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        /* Waterfall Diagram */
+        .waterfall {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .waterfall-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .waterfall-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .waterfall-value {
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a365d;
+        }
+
+        .waterfall-arrow {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 16px;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .sku-result-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sku-result-column {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .sku-result-column:last-child {
+                border-bottom: none;
+            }
+
+            .waterfall-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .waterfall-arrow {
+                text-align: left;
+            }
+
+            .step-indicator {
+                font-size: 12px;
+            }
+
+            .step-dot {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .step-line {
+                width: 40px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .header {
+                page-break-after: avoid;
+            }
+
+            .step-indicator,
+            .nav-buttons,
+            .btn-group,
+            .btn {
+                display: none !important;
+            }
+
+            .card,
+            .sku-result {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+                page-break-inside: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            .footer {
+                border-top: 1px solid #e2e8f0;
+            }
+        }
+
+        /* Summary table */
+        .summary-table {
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .summary-table table {
+            min-width: 800px;
+        }
+    </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="header-icon">&#128200;</div>
-  <div>
-    <h1>Value Chain Analysis</h1>
-    <p>Channel Profitability Analysis &#8212; Automated Supply Price, TAC, GP &amp; Gross Margin</p>
-    <p class="built">Built by <strong>Jacky J. Son</strong> &nbsp;&middot;&nbsp; Chief Strategy Officer &nbsp;&middot;&nbsp; Global Business Team</p>
-  </div>
-</div>
-
-<div class="steps">
-  <div class="step" onclick="showTab(1)"><div class="step-dot active" id="dot1">1</div><span class="step-label active" id="lbl1">Basic Info</span></div>
-  <div class="step-line" id="line1"></div>
-  <div class="step" onclick="showTab(2)"><div class="step-dot" id="dot2">2</div><span class="step-label" id="lbl2">Channel</span></div>
-  <div class="step-line" id="line2"></div>
-  <div class="step" onclick="showTab(3)"><div class="step-dot" id="dot3">3</div><span class="step-label" id="lbl3">SKU Costs</span></div>
-  <div class="step-line" id="line3"></div>
-  <div class="step" onclick="showTab(4)"><div class="step-dot" id="dot4">4</div><span class="step-label" id="lbl4">Promotion</span></div>
-  <div class="step-line" id="line4"></div>
-  <div class="step" onclick="showTab(5)"><div class="step-dot" id="dot5">5</div><span class="step-label" id="lbl5">Results</span></div>
-</div>
-
-<div class="container">
-
-<!-- ══ TAB 1 기본정보 ══ -->
-<div class="panel active" id="panel1">
-  <div class="card">
-    <div class="card-title">&#128203; Basic Information</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Brand Name</label>
-        <input type="text" id="brand" placeholder="e.g., Cinnamon Lab">
-      </div>
-      <div class="form-group">
-        <label>Origin Country</label>
-        <input type="text" id="country" placeholder="e.g., USA, Australia">
-      </div>
-      <div class="form-group">
-        <label>Analysis Purpose</label>
-        <select id="purpose">
-          <option value="입점 검토">New Channel Evaluation</option>
-          <option value="가격 시뮬레이션">Price Simulation</option>
-          <option value="수익성 리뷰">Profitability Review</option>
-          <option value="채널 비교">Channel Comparison</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Memo / Note</label>
-        <input type="text" id="memo" placeholder="e.g., 2026 Q2 Channel Review">
-      </div>
-    </div>
-    <div class="info-box" style="margin-top:16px">
-      <strong>&#128203; Calculation Structure</strong><br>
-      &#9312; RSP Ex.VAT = Consumer Price (RSP) &divide; 1.1 (VAT excluded)<br>
-      &#9313; Supply Price = RSP Ex.VAT &times; (1 &minus; GP%) &nbsp;&#8212;&nbsp; <strong>GP = Retail Margin basis</strong><br>
-      &#9314; TAC = Landed Cost + Packaging + Labor + Logistics(Supply%) + Other + Vendor Fee(Supply%)<br>
-      &#9315; Revenue = Supply Price &minus; TAC &nbsp;&#8212;&nbsp; <strong>Gross Margin = Revenue &divide; Supply Price</strong><br>
-      &#9316; Trade Conditions shown separately (excluded from GP, reference cost only)
-    </div>
-  </div>
-  <div class="nav-bar">
-    <button class="btn btn-sample" onclick="loadSample()">&#128197; Load Sample Data (Verification)</button>
-    <button class="btn btn-primary" onclick="showTab(2)">Next &#8250; Channel Selection</button>
-  </div>
-</div>
-
-<!-- ══ TAB 2 채널 선택 ══ -->
-<div class="panel" id="panel2">
-  <div class="card">
-    <div class="card-title">&#128722; Channel Selection</div>
-    <div class="channel-box">
-      <div class="ch-field">
-        <label>Channel Category</label>
-        <select id="ch-cat" onchange="updateRetailers()">
-          <option value="">-- Select --</option>
-          <option value="C-Stores">C-Stores</option>
-          <option value="Drug Store">Drug Store</option>
-          <option value="Hypermarket">Hypermarket</option>
-          <option value="Supermarket">Supermarket</option>
-          <option value="Dept. Stores">Dept. Stores</option>
-          <option value="E-Commerce">E-Commerce</option>
-          <option value="Club Stores">Club Stores</option>
-          <option value="HORECA">HORECA</option>
-          <option value="Home Shopping">Home Shopping</option>
-        </select>
-      </div>
-      <div class="ch-field">
-        <label>Retailer / Platform</label>
-        <select id="ch-retailer" onchange="updateGP()">
-          <option value="">-- Select category first --</option>
-        </select>
-      </div>
-      <div class="ch-field">
-        <label>GP (Retail Margin %)</label>
-        <input type="number" id="gp-pct" step="0.1" min="0" max="100" placeholder="%" onchange="showGPBadge()">
-        <span class="hint">Auto-filled on selection &mdash; editable</span>
-      </div>
-      <div class="ch-field">
-        <label>Trade Conditions &amp; Returns %</label>
-        <input type="number" id="trade-pct" step="0.1" min="0" max="100" placeholder="%" readonly style="background:#f0fff4">
-        <span class="hint" style="color:#276749">&#8251; Reference only (excluded from GP, shown separately)</span>
-      </div>
-      <div class="ch-field">
-        <label>Add&#39;l Channel Logistics % <span style="font-weight:400;font-size:10px">(if applicable)</span></label>
-        <input type="number" id="ch-logistics" step="0.1" min="0" max="100" value="0" placeholder="예: 3.4 (코스트코)">
-        <span class="hint">Enter if deducted before supply price (e.g., Costco 3.4%)</span>
-      </div>
-      <div class="ch-field" style="align-self:center">
-        <div id="gp-display" style="display:none">
-          <div style="font-size:11px;color:#234e52;font-weight:600;margin-bottom:4px">Applied GP</div>
-          <span class="gp-badge" id="gp-badge">GP: --%</span>
-          <span class="trade-badge" id="trade-badge" style="margin-left:6px">Trade: --%</span>
-        </div>
-      </div>
-    </div>
-    <div class="warn-box">
-      &#128204; <strong>Industry Standard Retail Margin</strong> &mdash; Adjust GP based on actual contract terms.<br>
-      Trade Conditions &amp; Returns cover logistics pass-through, platform fees etc., calculated separately.
-    </div>
-  </div>
-  <div class="nav-bar">
-    <button class="btn btn-outline" onclick="showTab(1)">&#8249; Back</button>
-    <button class="btn btn-primary" onclick="showTab(3)">Next &#8250; SKU Cost Input</button>
-  </div>
-</div>
-
-<!-- ══ TAB 3 SKU 원가 입력 ══ -->
-<div class="panel" id="panel3">
-  <div class="card">
-    <div class="card-title">&#128230; SKU Cost Input <span style="font-size:11px;font-weight:400;color:#718096;margin-left:8px">&#8212; Enter RSP and costs per SKU (multiple SKUs supported)</span></div>
-    <div class="sku-toolbar">
-      <span style="font-size:11px;color:#718096">&#9998; Amounts in KRW. Logistics &amp; vendor fee as % of supply price</span>
-      <button class="btn-add" onclick="addSKU()">+ Add SKU</button>
-    </div>
-    <div style="overflow-x:auto">
-    <table class="sku-table">
-      <thead><tr>
-        <th style="width:26px">#</th>
-        <th style="min-width:120px">SKU Name</th>
-        <th style="min-width:90px">Consumer Price<br>(RSP)</th>
-        <th style="min-width:90px">Landed Cost<br>(KRW/unit)</th>
-        <th style="min-width:72px">Packaging<br>(KRW)</th>
-        <th style="min-width:72px">Labor<br>(KRW)</th>
-        <th style="min-width:80px">Ch. Logistics<br>(%)</th>
-        <th style="min-width:72px">Other<br>(KRW)</th>
-        <th style="min-width:80px">Vendor Fee<br>(%)</th>
-        <th style="min-width:80px">FOC<br>(%)</th>
-        <th style="min-width:80px">Mfg. Supply Price<br>(KRW/unit)</th>
-        <th style="min-width:72px">Order QTY</th>
-        <th style="width:36px"></th>
-      </tr></thead>
-      <tbody id="sku-tbody"></tbody>
-    </table>
-    </div>
-    <div class="warn-box" style="margin-top:12px">
-      &#128204; <strong>TAC 계산식</strong> : 수입원가 + 부자재 + 작업비 + <em>(채널물류비% &times; 납품가)</em> + 기타 + <em>(벤더수수료% &times; 납품가)</em> <span style="color:#276749;font-weight:700">&minus; FOC (= 제조사공급가 &times; FOC%)</span>
-    </div>
-  </div>
-  <div class="nav-bar">
-    <button class="btn btn-outline" onclick="showTab(2)">&#8249; Back</button>
-    <button class="btn btn-primary" onclick="showTab(4)">Next &#8250; Promotion Settings</button>
-  </div>
-</div>
-
-<!-- ══ TAB 4 프로모션 ══ -->
-<div class="panel" id="panel4">
-  <div class="card">
-    <div class="card-title">&#127881; Promotion Event Settings</div>
-
-    <div style="display:flex;gap:16px;margin-bottom:20px">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:#4a5568">
-        <input type="radio" name="promo-yn" id="promo-no" value="no" checked onchange="togglePromo()"
-          style="accent-color:#2b6cb0;width:16px;height:16px">
-        No Promotion (Normal Sale Only)
-      </label>
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:#e53e3e">
-        <input type="radio" name="promo-yn" id="promo-yes" value="yes" onchange="togglePromo()"
-          style="accent-color:#e53e3e;width:16px;height:16px">
-        Apply Promotion (Normal vs. Promo)
-      </label>
+    <div class="header">
+        <h1>Korea Retail Channel Value Chain Analyzer</h1>
+        <p>Professional FMCG Import Profitability Analysis Tool</p>
     </div>
 
-    <div id="promo-form" style="display:none">
-      <div style="background:linear-gradient(135deg,#fff5f5,#fed7d7);border:1.5px solid #fc8181;border-radius:10px;padding:20px 24px;margin-bottom:16px">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Event Name</label>
-            <input type="text" id="promo-name" placeholder="e.g., Olive Young Sale, Costco Roadshow">
-          </div>
-          <div class="form-group">
-            <label>Event Period (reference)</label>
-            <input type="text" id="promo-period" placeholder="e.g., 2026.04.01 ~ 04.07">
-          </div>
-          <div class="form-group">
-            <label>Discount Rate (%)</label>
-            <input type="number" id="promo-discount" step="0.1" min="0" max="100" placeholder="예: 20"
-              oninput="updateOurBurden()">
-            <span class="hint">Discount based on consumer price (RSP)</span>
-          </div>
-          <div class="form-group">
-            <label>Channel Support Rate (%)</label>
-            <input type="number" id="promo-ch-support" step="0.1" min="0" max="100" placeholder="예: 50"
-              oninput="updateOurBurden()">
-            <span class="hint">Channel share of discount (e.g., Olive Young 50%, Costco 4%)</span>
-          </div>
-        </div>
-
-        <div style="margin-top:16px;background:#fff;border-radius:8px;padding:14px 18px;border:1px solid #fc8181">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center">
-            <div>
-              <div style="font-size:10px;color:#718096;text-transform:uppercase;font-weight:600;letter-spacing:.4px">Total Discount</div>
-              <div id="burden-total" style="font-size:20px;font-weight:700;color:#c53030">—</div>
-            </div>
-            <div style="border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0">
-              <div style="font-size:10px;color:#718096;text-transform:uppercase;font-weight:600;letter-spacing:.4px">Channel Portion</div>
-              <div id="burden-channel" style="font-size:20px;font-weight:700;color:#2b6cb0">—</div>
-            </div>
-            <div>
-              <div style="font-size:10px;color:#718096;text-transform:uppercase;font-weight:600;letter-spacing:.4px">Our Portion</div>
-              <div id="burden-ours" style="font-size:20px;font-weight:700;color:#e53e3e">—</div>
-            </div>
-          </div>
-          <div style="margin-top:10px;font-size:11px;color:#718096;text-align:center">
-            행사 공급가 = 일반 납품가 &times; (1 &minus; 할인율 &times; <strong>Our Portion율</strong>)
-          </div>
-        </div>
-      </div>
-
-      <div class="info-box">
-        &#128204; <strong>Promotion Profitability Calculation</strong><br>
-        &#8226; Promo Supply = Normal Supply &times; (1 &minus; Discount &times; Our Burden Rate)<br>
-        &#8226; Promo TAC = Landed Cost + Packaging + Labor + <em>(Logistics% &times; Promo Supply)</em> + Other + <em>(Vendor Fee% &times; Promo Supply)</em><br>
-        &#8226; Promo GM = (Promo Supply &minus; Promo TAC) &divide; Promo Supply<br>
-        &#8226; Results show both <strong>Normal Sale</strong> and <strong>Promo Sale</strong> scenarios side by side
-      </div>
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step-dot active" id="step-dot-1">1</div>
+        <div class="step-line" id="step-line-1"></div>
+        <div class="step-dot" id="step-dot-2">2</div>
+        <div class="step-line" id="step-line-2"></div>
+        <div class="step-dot" id="step-dot-3">3</div>
+        <div class="step-line" id="step-line-3"></div>
+        <div class="step-dot" id="step-dot-4">4</div>
+        <div class="step-line" id="step-line-4"></div>
+        <div class="step-dot" id="step-dot-5">5</div>
     </div>
 
-    <div id="promo-none-msg" style="background:#f7fafc;border-radius:8px;padding:16px 20px;color:#718096;font-size:13px;text-align:center">
-      &#9432; Selecting No Promotion analyzes normal sales only.<br>
-      To include a promotion, select <strong>&#39;Apply Promotion&#39;</strong> above.
-    </div>
-  </div>
-  <div class="nav-bar">
-    <button class="btn btn-outline" onclick="showTab(3)">&#8249; Back</button>
-    <button class="btn btn-success" onclick="calculate()">&#128202; Run Analysis</button>
-  </div>
-</div>
-
-<!-- ══ TAB 5 결과 ══ -->
-<div class="panel" id="panel5">
-  <div id="result-area">
-    <p style="text-align:center;color:#a0aec0;padding:40px">분석 실행 후 결과가 표시됩니다.</p>
-  </div>
-  <div class="nav-bar no-print">
-    <button class="btn btn-outline" onclick="showTab(4)">&#8249; Back</button>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-outline" onclick="printPDF()">&#128438; PDF 출력</button>
-      <button class="btn btn-success" onclick="exportExcel()">&#128202; Excel 내보내기</button>
-    </div>
-  </div>
-</div>
-
-</div><!-- /container -->
-
-<div class="page-footer">
-  <strong style="color:#4a5568">Value Chain Analysis</strong> &nbsp;|&nbsp;
-  Built by <strong style="color:#2b6cb0">Jacky J. Son</strong> &nbsp;&middot;&nbsp; Chief Strategy Officer &nbsp;&middot;&nbsp; Global Business Team<br>
-  <span style="font-size:10px;color:#cbd5e0">&#169; Cinnamon Lab &middot; All rights reserved</span>
-</div>
-
-<script>
-// ─── CHANNEL DATA ─────────────────────────────────────────
-var CHANNELS = {
-  "C-Stores": [
-    {name:"GS25",       gp:45, trade:12},
-    {name:"CU",         gp:45, trade:12},
-    {name:"7-Eleven",   gp:45, trade:12},
-    {name:"EMart24",    gp:45, trade:12}
-  ],
-  "Drug Store": [
-    {name:"Olive Young",gp:38, trade:12.5}
-  ],
-  "Hypermarket": [
-    {name:"Homeplus",   gp:40, trade:8},
-    {name:"Lotte Mart", gp:40, trade:8},
-    {name:"Emart",      gp:40, trade:8},
-    {name:"Hanaro Mart",gp:50, trade:8},
-    {name:"Mega Mart",  gp:40, trade:8}
-  ],
-  "Supermarket": [
-    {name:"Emart Everyday",    gp:40, trade:11},
-    {name:"Homeplus Express",  gp:40, trade:11},
-    {name:"Lotte Super",       gp:40, trade:11},
-    {name:"GS Super",          gp:40, trade:11}
-  ],
-  "Dept. Stores": [
-    {name:"Dept. Stores",gp:40, trade:12}
-  ],
-  "E-Commerce": [
-    {name:"Coupang",      gp:12, trade:20},
-    {name:"Market Kurly", gp:37, trade:5},
-    {name:"Naver",        gp:8,  trade:20}
-  ],
-  "Club Stores": [
-    {name:"Emart Traders",gp:16, trade:7},
-    {name:"Costco",       gp:15, trade:4}
-  ],
-  "HORECA": [
-    {name:"Franchise",    gp:50, trade:3}
-  ],
-  "Home Shopping": [
-    {name:"Hyundai",gp:38, trade:5},
-    {name:"CJ",     gp:38, trade:5},
-    {name:"GS",     gp:38, trade:5}
-  ]
-};
-
-var skuCount = 0;
-var lastResults = [];
-var lastMeta = {};
-
-// ─── TAB CONTROL ──────────────────────────────────────────
-function showTab(n) {
-  for (var i = 1; i <= 5; i++) {
-    document.getElementById("panel" + i).classList.remove("active");
-    var d = document.getElementById("dot" + i);
-    var l = document.getElementById("lbl" + i);
-    d.classList.remove("active","done");
-    l.classList.remove("active");
-    if (i < n)       { d.classList.add("done"); d.textContent = "v"; }
-    else if (i === n){ d.classList.add("active"); d.textContent = i; l.classList.add("active"); }
-    else             { d.textContent = i; }
-    if (i < 5) document.getElementById("line" + i).classList.toggle("done", i < n);
-  }
-  document.getElementById("panel" + n).classList.add("active");
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
-// ─── CHANNEL DROPDOWN ─────────────────────────────────────
-function updateRetailers() {
-  var cat = document.getElementById("ch-cat").value;
-  var sel = document.getElementById("ch-retailer");
-  sel.innerHTML = '<option value="">-- 리테일러 선택 --</option>';
-  if (!cat || !CHANNELS[cat]) return;
-  CHANNELS[cat].forEach(function(r) {
-    var opt = document.createElement("option");
-    opt.value = r.name;
-    opt.textContent = r.name;
-    sel.appendChild(opt);
-  });
-  document.getElementById("gp-pct").value = "";
-  document.getElementById("trade-pct").value = "";
-  document.getElementById("gp-display").style.display = "none";
-}
-
-function updateGP() {
-  var cat = document.getElementById("ch-cat").value;
-  var retailer = document.getElementById("ch-retailer").value;
-  if (!cat || !retailer) return;
-  var list = CHANNELS[cat];
-  for (var i = 0; i < list.length; i++) {
-    if (list[i].name === retailer) {
-      document.getElementById("gp-pct").value   = list[i].gp;
-      document.getElementById("trade-pct").value = list[i].trade;
-      showGPBadge();
-      return;
-    }
-  }
-}
-
-function showGPBadge() {
-  var gp    = document.getElementById("gp-pct").value;
-  var trade = document.getElementById("trade-pct").value;
-  var disp  = document.getElementById("gp-display");
-  if (gp) {
-    document.getElementById("gp-badge").textContent    = "GP: " + gp + "%";
-    document.getElementById("trade-badge").textContent = "Trade: " + (trade||"0") + "%";
-    disp.style.display = "block";
-  }
-}
-
-// ─── SKU ROWS ─────────────────────────────────────────────
-function addSKU() {
-  skuCount++;
-  var tbody = document.getElementById("sku-tbody");
-  var num   = tbody.children.length + 1;
-  var tr    = document.createElement("tr");
-  tr.id     = "sku-" + skuCount;
-  tr.innerHTML =
-    '<td class="sku-num">#' + num + '</td>' +
-    '<td><input type="text" placeholder="Product / SKU Name" style="width:118px;text-align:left;padding-left:7px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:88px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:88px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:70px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:70px"></td>' +
-    '<td><input type="number" placeholder="0.0" step="0.1" min="0" max="100" style="width:78px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:70px"></td>' +
-    '<td><input type="number" placeholder="0.0" step="0.1" min="0" max="100" style="width:78px"></td>' +
-    '<td><input type="number" placeholder="0.0" step="0.1" min="0" max="100" style="width:76px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:86px"></td>' +
-    '<td><input type="number" placeholder="0" step="1" min="0" style="width:70px"></td>' +
-    '<td><button class="btn-danger" onclick="removeSKU(this)">X</button></td>';
-  tbody.appendChild(tr);
-}
-
-function removeSKU(btn) {
-  var tbody = document.getElementById("sku-tbody");
-  if (tbody.children.length <= 1) { alert("At least 1 SKU is required."); return; }
-  btn.closest("tr").remove();
-  var rows = tbody.children;
-  for (var i = 0; i < rows.length; i++)
-    rows[i].querySelector(".sku-num").textContent = "#" + (i+1);
-}
-
-// ─── SAMPLE DATA ──────────────────────────────────────────
-function loadSample() {
-  // 트레이더스 프로틴프레첼 검증용
-  document.getElementById("brand").value   = "Sample Brand (Verification)";
-  document.getElementById("country").value = "USA";
-  document.getElementById("memo").value    = "Spreadsheet Verification";
-  document.getElementById("ch-cat").value  = "Club Stores";
-  updateRetailers();
-  document.getElementById("ch-retailer").value = "Emart Traders";
-  document.getElementById("gp-pct").value  = "18";   // 실제 계약 GP
-  document.getElementById("trade-pct").value = "7";
-  showGPBadge();
-
-  // Clear existing
-  var tbody = document.getElementById("sku-tbody");
-  tbody.innerHTML = "";
-  skuCount = 0;
-
-  var samples = [
-    ["Traders Protein Pretzel", 12900, 4575, 0, 0, 4, 0, 0, 0],
-    ["Costco Protein Pretzel (GP:13.9%)", 14900, 4575, 0, 150, 4, 0, 0, 0]
-  ];
-  samples.forEach(function(s) {
-    addSKU();
-    var row = document.getElementById("sku-tbody").lastElementChild;
-    var inp = row.querySelectorAll("input");
-    inp[0].value = s[0]; inp[1].value = s[1]; inp[2].value = s[2];
-    inp[3].value = s[3]; inp[4].value = s[4]; inp[5].value = s[5];
-    inp[6].value = s[6]; inp[7].value = s[7]; inp[8].value = s[8];
-  });
-  // 두번째 SKU는 GP 13.9% 별도 처리 — 사용자에게 안내
-  alert("Sample data loaded.\n\nExpected values:\nE.Traders GP=18%: Supply 9,616 / TAC 4,960 / GM 48.42%\nCostco GP=13.9%: Supply 11,663 / TAC 5,192 / GM 55.49%\n\nNote: Adjust Costco GP on Channel tab.\nFor multi-channel comparison, run separate analyses.");
-  showTab(3);
-}
-
-// ─── CALCULATE ────────────────────────────────────────────
-function calculate() {
-  var brand    = document.getElementById("brand").value.trim()   || "-";
-  var country  = document.getElementById("country").value.trim() || "-";
-  var purpose  = document.getElementById("purpose").value;
-  var memo     = document.getElementById("memo").value.trim();
-  var cat      = document.getElementById("ch-cat").value        || "-";
-  var retailer = document.getElementById("ch-retailer").value   || "-";
-  var gpPct    = parseFloat(document.getElementById("gp-pct").value)   || 0;
-  var tradePct = parseFloat(document.getElementById("trade-pct").value) || 0;
-  var chLog    = parseFloat(document.getElementById("ch-logistics").value) || 0;
-
-  var rows = document.querySelectorAll("#sku-tbody tr");
-  if (!rows.length) { alert("Please enter at least 1 SKU."); showTab(3); return; }
-
-  var skus = [];
-  for (var i = 0; i < rows.length; i++) {
-    var cells = rows[i].querySelectorAll("input");
-    var name  = cells[0].value.trim();
-    if (!name) continue;
-    var rsp       = parseFloat(cells[1].value) || 0;
-    var lc        = parseFloat(cells[2].value) || 0;
-    var packaging = parseFloat(cells[3].value) || 0;
-    var labor     = parseFloat(cells[4].value) || 0;
-    var logPct    = parseFloat(cells[5].value) || 0;
-    var other     = parseFloat(cells[6].value) || 0;
-    var vendorPct = parseFloat(cells[7].value) || 0;
-    var focPct       = parseFloat(cells[8].value)  || 0;
-    var mfgPrice     = parseFloat(cells[9].value)  || 0;
-    var qty          = parseInt(cells[10].value)   || 0;
-    if (rsp <= 0) { alert(name + "RSP value is required."); return; }
-    skus.push({name:name, rsp:rsp, lc:lc, packaging:packaging, labor:labor,
-               logPct:logPct, other:other, vendorPct:vendorPct,
-               focPct:focPct, mfgPrice:mfgPrice, qty:qty});
-  }
-  if (!skus.length) { alert("Please enter valid SKU data."); return; }
-
-  var gpRate    = gpPct    / 100;
-  var tradeRate = tradePct / 100;
-  var chLogRate = chLog    / 100;
-
-  var results = [];
-  for (var i = 0; i < skus.length; i++) {
-    var s = skus[i];
-    var rspExVat   = s.rsp / 1.1;
-    var gpAmount   = rspExVat * gpRate;
-    var marginal   = rspExVat * (1 - gpRate);           // ①-② (pre-round)
-    // 채널 별도 물류비가 있는 경우 추가 차감
-    var supplyPrice = rspExVat * (1 - gpRate - chLogRate);
-    var supplyRounded = Math.round(supplyPrice);        // KRW 반올림
-
-    var logAmt    = (s.logPct    / 100) * supplyRounded;
-    var vendorAmt = (s.vendorPct / 100) * supplyRounded;
-    // FOC = 제조사 공급가 × FOC% (unit당, 원가 차감 항목)
-    var focPerUnit  = s.mfgPrice * (s.focPct / 100);
-    var focTotal    = focPerUnit * (s.qty > 0 ? s.qty : 1);
-    var tac       = s.lc + s.packaging + s.labor + logAmt + s.other + vendorAmt - focPerUnit;
-    var revenue   = supplyRounded - tac;
-    var gm        = supplyRounded > 0 ? revenue / supplyRounded : 0;
-
-    // Trade Conditions 별도 계산
-    var tradeAmt  = supplyRounded * tradeRate;
-    var revAdj    = revenue - tradeAmt;
-    var gmAdj     = supplyRounded > 0 ? revAdj / supplyRounded : 0;
-
-    results.push({
-      name:s.name, rsp:s.rsp, rspExVat:rspExVat, gpRate:gpRate, gpAmount:gpAmount,
-      marginal:marginal, supply:supplyRounded, supplyExact:supplyPrice,
-      lc:s.lc, packaging:s.packaging, labor:s.labor,
-      logPct:s.logPct, logAmt:logAmt,
-      other:s.other, vendorPct:s.vendorPct, vendorAmt:vendorAmt,
-      focPct:s.focPct, mfgPrice:s.mfgPrice, qty:s.qty,
-      focPerUnit:focPerUnit, focTotal:focTotal,
-      tac:tac, revenue:revenue, gm:gm,
-      tradeAmt:tradeAmt, tradeRate:tradeRate, revAdj:revAdj, gmAdj:gmAdj
-    });
-  }
-
-  // 프로모션 설정 수집
-  var hasPromo   = document.getElementById("promo-yes").checked;
-  var promoName  = hasPromo ? (document.getElementById("promo-name").value.trim()    || "행사") : "";
-  var promoPeriod= hasPromo ? (document.getElementById("promo-period").value.trim()  || "")    : "";
-  var promoDisc  = hasPromo ? (parseFloat(document.getElementById("promo-discount").value) || 0)    : 0;
-  var promoChSup = hasPromo ? (parseFloat(document.getElementById("promo-ch-support").value) || 0)  : 0;
-
-  lastResults = results;
-  lastMeta    = {brand:brand, country:country, purpose:purpose, memo:memo,
-                 cat:cat, retailer:retailer, gpPct:gpPct, tradePct:tradePct, chLog:chLog,
-                 hasPromo:hasPromo, promoName:promoName, promoPeriod:promoPeriod,
-                 promoDisc:promoDisc, promoChSup:promoChSup};
-  renderResults(results, lastMeta);
-  showTab(5);
-}
-
-// ─── RENDER ───────────────────────────────────────────────
-function n(v, d) {
-  if (d === undefined) d = 0;
-  if (v == null || isNaN(v)) return "-";
-  return v.toLocaleString("en-US", {minimumFractionDigits:d, maximumFractionDigits:d});
-}
-function p(v) { return (v*100).toFixed(2) + "%"; }
-
-function calcPromo(r, discRate, chSupRate, tradeRate) {
-  // ① 총 할인액 = 소비자가 × 할인율
-  var totalDiscountAmt  = r.rsp * discRate;
-  // ② 채널 부담액 = 총 할인액 × 채널 지원율
-  var channelBurdenAmt  = totalDiscountAmt * chSupRate;
-  // ③ 우리 부담액 = 총 할인액 × 우리 부담율
-  var ourBurdenRate     = 1 - chSupRate;
-  var ourBurdenAmt      = totalDiscountAmt * ourBurdenRate;
-  // ④ 행사 납품가 = 일반 납품가 - 우리 부담액
-  var promoSupply       = r.supply - ourBurdenAmt;
-  var promoLogAmt  = (r.logPct    / 100) * promoSupply;
-  var promoVenAmt  = (r.vendorPct / 100) * promoSupply;
-  var promoTac     = r.lc + r.packaging + r.labor + promoLogAmt + r.other + promoVenAmt;
-  var promoRev     = promoSupply - promoTac;
-  var promoGM      = promoSupply > 0 ? promoRev / promoSupply : 0;
-  var promoTrade   = promoSupply * tradeRate;
-  var promoRevAdj  = promoRev - promoTrade;
-  var promoGMAdj   = promoSupply > 0 ? promoRevAdj / promoSupply : 0;
-  return {supply:promoSupply, logAmt:promoLogAmt, venAmt:promoVenAmt,
-          tac:promoTac, revenue:promoRev, gm:promoGM,
-          tradeAmt:promoTrade, revAdj:promoRevAdj, gmAdj:promoGMAdj,
-          ourBurdenRate:ourBurdenRate, ourBurdenAmt:ourBurdenAmt,
-          channelBurdenAmt:channelBurdenAmt, totalDiscountAmt:totalDiscountAmt,
-          discRate:discRate, chSupRate:chSupRate};
-}
-
-function renderResults(res, meta) {
-  var today = new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",weekday:"short"});
-  var html  = "";
-  var tradeRate = meta.tradePct / 100;
-
-  html += '<div class="result-banner">'
-        + '<span>&#128197; 분석 일자: <strong>' + today + '</strong></span>'
-        + '<span style="color:#90cdf4">Built by <strong style="color:#fbd38d">Jacky J. Son</strong> &middot; CSO &middot; Global Business Team</span>'
-        + '</div>';
-
-  // 프로모션 배너
-  if (meta.hasPromo) {
-    html += '<div style="background:linear-gradient(90deg,#c53030,#e53e3e);color:#fff;border-radius:10px;padding:10px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;font-size:12px">'
-          + '<span>&#127881; 행사: <strong>' + meta.promoName + '</strong>'
-          + (meta.promoPeriod ? ' &nbsp;(' + meta.promoPeriod + ')' : '')
-          + ' &nbsp;|&nbsp; 할인율: <strong>' + meta.promoDisc + '%</strong>'
-          + ' &nbsp;|&nbsp; 채널지원: <strong>' + meta.promoChSup + '%</strong>'
-          + ' &nbsp;|&nbsp; 우리부담: <strong>' + (meta.promoDisc*(1-meta.promoChSup/100)).toFixed(1) + '%</strong></span>'
-          + '<span style="background:rgba(255,255,255,.2);border-radius:6px;padding:3px 10px">일반 + 행사 비교 분석</span>'
-          + '</div>';
-  }
-
-  html += '<div class="meta-grid">'
-        + '<div class="meta-chip"><div class="v">' + meta.brand + '</div><div class="k">브랜드</div></div>'
-        + '<div class="meta-chip"><div class="v">' + meta.cat + '</div><div class="k">채널 카테고리</div></div>'
-        + '<div class="meta-chip"><div class="v">' + meta.retailer + '</div><div class="k">리테일러</div></div>'
-        + '<div class="meta-chip"><div class="v">GP ' + meta.gpPct + '% / Trade ' + meta.tradePct + '%</div><div class="k">수수료 구조</div></div>'
-        + '</div>';
-
-  for (var i = 0; i < res.length; i++) {
-    var r = res[i];
-    html += '<div class="sku-result">'
-          + '<div class="sr-header">'
-          + '<div><div class="sr-title">&#128230; ' + r.name + '</div>'
-          + '<div class="sr-meta">RSP: ' + n(r.rsp) + ' KRW &nbsp;|&nbsp; 공급가액: ' + n(r.rspExVat,0) + ' KRW &nbsp;|&nbsp; GP: ' + n(r.gpPct*100,1) + '%</div></div>'
-          + '</div>'
-          + '<div class="sr-body">';
-
-    // Col 1: 매출 구조
-    html += '<div class="sr-col"><div class="sr-col-title">&#128200; 매출 구조 (Revenue Side)</div>'
-          + '<div class="vc-row"><span class="vc-lbl">소비자가 (RSP)</span><span class="vc-val">' + n(r.rsp) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">공급가액 (RSP Ex.VAT)</span><span class="vc-val">' + n(r.rspExVat,0) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">&#8658; 채널 GP (' + n(r.gpRate*100,1) + '%)</span><span class="vc-val">&#8722; ' + n(r.gpAmount,0) + ' KRW</span></div>'
-          + (meta.chLog > 0 ? '<div class="vc-row"><span class="vc-lbl">&#8658; 채널 물류비 (' + meta.chLog + '%)</span><span class="vc-val">&#8722; ' + n(r.rspExVat*meta.chLog/100,0) + ' KRW</span></div>' : '')
-          + '<div class="vc-sep"></div>'
-          + '<div class="vc-row vc-total"><span class="vc-lbl">&#9313; 납품가 (Supply Price)</span><span class="vc-val">' + n(r.supply) + ' KRW</span></div>'
-          + '</div>';
-
-    // Col 2: 원가 구조
-    html += '<div class="sr-col"><div class="sr-col-title">&#128179; 원가 구조 (Cost Side / TAC)</div>'
-          + '<div class="vc-row"><span class="vc-lbl">수입원가 (Landed Cost)</span><span class="vc-val">' + n(r.lc) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">부자재</span><span class="vc-val">' + n(r.packaging) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">작업비</span><span class="vc-val">' + n(r.labor) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">채널 물류비 (' + n(r.logPct,1) + '%)</span><span class="vc-val">' + n(r.logAmt,0) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">Other</span><span class="vc-val">' + n(r.other) + ' KRW</span></div>'
-          + '<div class="vc-row"><span class="vc-lbl">벤더수수료 (' + n(r.vendorPct,1) + '%)</span><span class="vc-val">' + n(r.vendorAmt,0) + ' KRW</span></div>'
-          + '<div class="vc-row" style="background:#f0fff4"><span class="vc-lbl" style="color:#276749">&#8613; FOC 리베이트 (' + n(r.focPct,1) + '% × 제조사공급가)</span><span class="vc-val" style="color:#276749">&#8722; ' + n(r.focPerUnit,0) + ' KRW/unit</span></div>'
-          + (r.qty > 0 ? '<div class="vc-row" style="background:#f0fff4"><span class="vc-lbl" style="color:#276749;font-size:11px">&nbsp;&nbsp;총 FOC Cash (' + n(r.qty) + '개 × ' + n(r.mfgPrice) + ' × ' + n(r.focPct,1) + '%)</span><span class="vc-val" style="color:#276749">&#8722; ' + n(r.focTotal,0) + ' KRW</span></div>' : '')
-          + '<div class="vc-sep"></div>'
-          + '<div class="vc-row vc-total"><span class="vc-lbl">&#9314; 취득원가 (TAC)</span><span class="vc-val">' + n(r.tac,0) + ' KRW</span></div>'
-          + '</div>';
-
-    // Col 3: GM
-    html += '<div class="gm-box">'
-          + '<div class="gm-lbl">Gross Margin</div>'
-          + '<div class="gm-val">' + (r.gm*100).toFixed(2) + '%</div>'
-          + '<div class="gm-sub">Revenue: ' + n(r.revenue,0) + ' KRW</div>'
-          + '<div class="gm-divider"></div>'
-          + '<div class="gm-lbl">Trade Conditions 반영 후</div>'
-          + '<div style="font-size:16px;font-weight:700;color:#fc8181">' + (r.gmAdj*100).toFixed(2) + '%</div>'
-          + '<div class="gm-sub">Trade: &#8722;' + n(r.tradeAmt,0) + ' KRW (' + n(r.tradeRate*100,1) + '%)</div>'
-          + '<div class="gm-divider"></div>'
-          + '<div class="gm-lbl" style="font-size:9px">Total Channel Cost</div>'
-          + '<div style="font-size:13px;color:#fbd38d;font-weight:700">' + n((r.gpRate + r.tradeRate)*100,1) + '%</div>'
-          + '</div>';
-
-    html += '</div></div>'; // sr-body, sku-result (normal)
-
-    // ── PROMO CARD ──
-    if (meta.hasPromo) {
-      var discRate = meta.promoDisc / 100;
-      var chSupRate= meta.promoChSup / 100;
-      var pr = calcPromo(r, discRate, chSupRate, tradeRate);
-      var promoRSP = Math.round(r.rsp * (1 - discRate));
-
-      html += '<div class="sku-result" style="border:2px solid #fc8181">'
-            + '<div class="sr-header" style="background:linear-gradient(135deg,#742a2a,#c53030)">'
-            + '<div><div class="sr-title">&#127881; [행사] ' + r.name
-            + ' &nbsp;<span style="font-size:11px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px">'
-            + meta.promoName + ' &mdash; ' + meta.promoDisc + '% OFF</span></div>'
-            + '<div class="sr-meta">행사가: ' + n(promoRSP) + ' KRW &nbsp;|&nbsp; 납품가: ' + n(pr.supply,0) + ' KRW &nbsp;|&nbsp; 우리부담: ' + (pr.ourBurdenRate*100).toFixed(1) + '%</div></div>'
-            + '</div>'
-            + '<div class="sr-body">';
-
-      // Col 1: 행사 매출 구조
-      html += '<div class="sr-col"><div class="sr-col-title" style="color:#c53030">&#127881; 행사 매출 구조</div>'
-            + '<div class="vc-row"><span class="vc-lbl">일반 소비자가</span><span class="vc-val">' + n(r.rsp) + ' KRW</span></div>'
-            + '<div class="vc-row" style="background:#fff5f5"><span class="vc-lbl" style="color:#c53030">행사 할인 (' + meta.promoDisc + '% OFF)</span><span class="vc-val" style="color:#c53030">&#8594; ' + n(promoRSP) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl" style="color:#c53030">채널 지원 (' + meta.promoChSup + '%)</span><span class="vc-val" style="color:#2b6cb0">+' + n(pr.channelBurdenAmt,0) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl" style="color:#c53030">Our Portion (' + (pr.ourBurdenRate*100).toFixed(1) + '%)</span><span class="vc-val" style="color:#c53030">&#8722;' + n(pr.ourBurdenAmt,0) + ' KRW</span></div>'
-            + '<div class="vc-sep"></div>'
-            + '<div class="vc-row vc-total" style="background:#fff5f5;color:#c53030"><span class="vc-lbl">&#9313; 행사 납품가</span><span class="vc-val">' + n(pr.supply,0) + ' KRW</span></div>'
-            + '<div class="vc-row" style="font-size:11px"><span class="vc-lbl">일반 대비 납품가 감소</span><span class="vc-val" style="color:#c53030">&#8722;' + n(r.supply - pr.supply,0) + ' KRW (' + ((1-pr.supply/r.supply)*100).toFixed(1) + '%)</span></div>'
-            + '</div>';
-
-      // Col 2: 행사 원가 구조
-      html += '<div class="sr-col"><div class="sr-col-title" style="color:#c53030">&#128179; 행사 원가 구조 (TAC)</div>'
-            + '<div class="vc-row"><span class="vc-lbl">수입원가</span><span class="vc-val">' + n(r.lc) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl">부자재</span><span class="vc-val">' + n(r.packaging) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl">작업비</span><span class="vc-val">' + n(r.labor) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl">채널물류비 (' + n(r.logPct,1) + '%, 행사가 기준)</span><span class="vc-val">' + n(pr.logAmt,0) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl">Other</span><span class="vc-val">' + n(r.other) + ' KRW</span></div>'
-            + '<div class="vc-row"><span class="vc-lbl">벤더수수료 (' + n(r.vendorPct,1) + '%, 행사가 기준)</span><span class="vc-val">' + n(pr.venAmt,0) + ' KRW</span></div>'
+    <!-- Step 1: Basic Info -->
+    <div class="step-content active" id="step-1">
+        <div class="card">
+            <div class="card-title">Step 1: Basic Information</div>
             
-            + '<div class="vc-sep"></div>'
-            + '<div class="vc-row vc-total" style="background:#fff5f5;color:#c53030"><span class="vc-lbl">&#9314; 행사 TAC</span><span class="vc-val">' + n(pr.tac,0) + ' KRW</span></div>'
-            + '</div>';
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brand-name">Brand Name</label>
+                    <input type="text" id="brand-name" placeholder="e.g., Cinnamon Lab">
+                </div>
+                <div class="form-group">
+                    <label for="origin-country">Origin Country</label>
+                    <input type="text" id="origin-country" placeholder="e.g., USA">
+                </div>
+            </div>
 
-      // Col 3: 행사 GM
-      html += '<div class="gm-box" style="background:linear-gradient(160deg,#742a2a,#c53030)">'
-            + '<div class="gm-lbl">행사 Gross Margin</div>'
-            + '<div class="gm-val">' + (pr.gm*100).toFixed(2) + '%</div>'
-            + '<div class="gm-sub">Revenue: ' + n(pr.revenue,0) + ' KRW</div>'
-            + '<div class="gm-divider"></div>'
-            + '<div class="gm-lbl">Trade Conditions 반영 후</div>'
-            + '<div style="font-size:16px;font-weight:700;color:#fbd38d">' + (pr.gmAdj*100).toFixed(2) + '%</div>'
-            + '<div class="gm-sub">Trade: &#8722;' + n(pr.tradeAmt,0) + ' KRW</div>'
-            + '<div class="gm-divider"></div>'
-            + '<div class="gm-lbl">일반 대비 GM 차이</div>'
-            + '<div style="font-size:13px;color:#fc8181;font-weight:700">'
-            + (((pr.gm - r.gm)*100) >= 0 ? '+' : '') + ((pr.gm - r.gm)*100).toFixed(2) + '%p</div>'
-            + '</div>';
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="analysis-purpose">Analysis Purpose</label>
+                    <select id="analysis-purpose">
+                        <option value="">-- Select Purpose --</option>
+                        <option value="New Channel Evaluation">New Channel Evaluation</option>
+                        <option value="Price Simulation">Price Simulation</option>
+                        <option value="Profitability Review">Profitability Review</option>
+                        <option value="Channel Comparison">Channel Comparison</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="analysis-date">Analysis Date</label>
+                    <input type="date" id="analysis-date">
+                </div>
+            </div>
 
-      html += '</div></div>'; // sr-body, promo sku-result
-    }
-  }
+            <div class="form-group">
+                <label for="memo">Memo / Note</label>
+                <textarea id="memo" placeholder="Optional notes about this analysis..."></textarea>
+            </div>
 
-  // Summary table
-  var promoHdr = meta.hasPromo
-    ? '<th style="background:#c53030">행사납품가</th><th style="background:#c53030">행사TAC</th><th class="hl" style="background:#742a2a">행사GM</th><th style="background:#742a2a">행사GM(Trade)</th><th style="background:#742a2a">GM 차이</th>'
-    : '';
-  html += '<div class="card" style="margin-top:18px">'
-        + '<div class="card-title">&#128202; 전체 요약 | ' + meta.retailer + ' (GP ' + meta.gpPct + '%)'
-        + (meta.hasPromo ? ' &nbsp;&#127881; ' + meta.promoName + ' ' + meta.promoDisc + '% 비교' : '')
-        + '</div>'
-        + '<div style="overflow-x:auto"><table class="summary-table"><thead><tr>'
-        + '<th>SKU Name</th><th>RSP</th><th>납품가(③)</th><th>TAC(④)</th>'
-        + '<th>Revenue</th><th class="hl">GM</th><th>GM(Trade)</th>'
-        + promoHdr
-        + '</tr></thead><tbody>';
-  for (var i = 0; i < res.length; i++) {
-    var r = res[i];
-    var promoCell = "";
-    if (meta.hasPromo) {
-      var pr2 = calcPromo(r, meta.promoDisc/100, meta.promoChSup/100, tradeRate);
-      var diff = (pr2.gm - r.gm)*100;
-      promoCell = '<td style="color:#c53030;font-weight:600">' + n(pr2.supply,0) + '</td>'
-                + '<td style="color:#c53030">' + n(pr2.tac,0) + '</td>'
-                + '<td style="font-weight:700;color:#c53030">' + (pr2.gm*100).toFixed(2) + '%</td>'
-                + '<td style="color:#742a2a;font-weight:600">' + (pr2.gmAdj*100).toFixed(2) + '%</td>'
-                + '<td style="font-weight:700;color:' + (diff>=0?"#276749":"#c53030") + '">'
-                + (diff>=0?"+":"") + diff.toFixed(2) + '%p</td>';
-    }
-    html += '<tr>'
-          + '<td style="text-align:left;font-weight:600">' + r.name + '</td>'
-          + '<td>' + n(r.rsp) + '</td>'
-          + '<td>' + n(r.supply) + '</td>'
-          + '<td>' + n(r.tac,0) + '</td>'
-          + '<td>' + n(r.revenue,0) + '</td>'
-          + '<td class="hl">' + (r.gm*100).toFixed(2) + '%</td>'
-          + '<td class="hl-green">' + (r.gmAdj*100).toFixed(2) + '%</td>'
-          + promoCell
-          + '</tr>';
-  }
-  html += '</tbody></table></div>'
-        + '<div style="margin-top:12px;font-size:11px;color:#718096;line-height:1.9">'
-        + '&#128204; 채널 카테고리: <strong>' + meta.cat + '</strong> &nbsp;|&nbsp; '
-        + 'GP(Retail Margin): <strong>' + meta.gpPct + '%</strong> &nbsp;|&nbsp; '
-        + 'Trade Conditions: <strong>' + meta.tradePct + '%</strong> &nbsp;|&nbsp; '
-        + 'Total Channel Cost: <strong>' + (meta.gpPct + meta.tradePct) + '%</strong> &nbsp;|&nbsp; '
-        + '분석일: <strong>' + new Date().toLocaleString("en-US") + '</strong>'
-        + '</div></div>';
+            <div class="btn-group">
+                <button class="btn btn-outline" onclick="loadSampleData()">Load Sample Data</button>
+                <button class="btn btn-outline" onclick="loadJSONFile()">Load JSON File</button>
+            </div>
 
-  document.getElementById("result-area").innerHTML = html;
-}
+            <div id="sample-data-info" class="info-box hidden">Sample data has been loaded. Click "Next" to proceed.</div>
+        </div>
 
-// ─── PRINT PDF ────────────────────────────────────────────
-function printPDF() {
-  if (!lastResults.length) { alert("Please run the analysis first."); return; }
-  var meta  = lastMeta;
-  var today = new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
-  var content = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Value Chain Analysis</title>"
-    + "<style>body{font-family:Malgun Gothic,Arial,sans-serif;padding:22px;font-size:11px;color:#2d3748}"
-    + "h2{color:#1a365d;margin-bottom:6px}p{margin-bottom:6px}"
-    + "table{width:100%;border-collapse:collapse;margin-top:10px}"
-    + "th{background:#2b6cb0;color:#fff;padding:7px;text-align:center;font-size:10px}"
-    + "td{padding:6px 8px;border-bottom:1px solid #e2e8f0;text-align:center}"
-    + ".hl{font-weight:700;color:#2b6cb0}.hlg{font-weight:700;color:#276749}"
-    + ".footer{margin-top:24px;font-size:9px;color:#a0aec0;text-align:center;border-top:1px solid #e2e8f0;padding-top:8px}"
-    + "</style></head><body>"
-    + "<h2>Value Chain Analysis Report</h2>"
-    + "<p><strong>Brand:</strong> " + meta.brand + " &nbsp;|&nbsp; "
-    + "<strong>채널:</strong> " + meta.cat + " &gt; " + meta.retailer + " &nbsp;|&nbsp; "
-    + "<strong>GP:</strong> " + meta.gpPct + "% &nbsp;|&nbsp; "
-    + "<strong>Trade:</strong> " + meta.tradePct + "% &nbsp;|&nbsp; "
-    + "<strong>일자:</strong> " + today + " &nbsp;|&nbsp; "
-    + "<strong>메모:</strong> " + (meta.memo||"-") + "</p>"
-    + "<table><thead><tr>"
-    + "<th>SKU Name</th><th>RSP</th><th>공급가액</th><th>납품가(③)</th>"
-    + "<th>수입원가</th><th>채널물류비</th><th>기타원가</th><th>TAC(④)</th>"
-    + "<th>Revenue</th><th class='hl'>Gross Margin</th><th class='hlg'>GM(Trade포함)</th>"
-    + "</tr></thead><tbody>";
-  for (var i = 0; i < lastResults.length; i++) {
-    var r = lastResults[i];
-    content += "<tr>"
-      + "<td style='text-align:left;font-weight:600'>" + r.name + "</td>"
-      + "<td>" + n(r.rsp) + "</td>"
-      + "<td>" + n(r.rspExVat,0) + "</td>"
-      + "<td>" + n(r.supply) + "</td>"
-      + "<td>" + n(r.lc) + "</td>"
-      + "<td>" + n(r.logAmt,0) + "</td>"
-      + "<td>" + n(r.packaging+r.labor+r.other+r.vendorAmt+r.foc,0) + "</td>"
-      + "<td>" + n(r.tac,0) + "</td>"
-      + "<td>" + n(r.revenue,0) + "</td>"
-      + "<td class='hl'>" + (r.gm*100).toFixed(2) + "%</td>"
-      + "<td class='hlg'>" + (r.gmAdj*100).toFixed(2) + "%</td>"
-      + "</tr>";
-  }
-  content += "</tbody></table>"
-    + "<div class='footer'>Built by Jacky J. Son &middot; CSO &middot; Global Business Team &middot; &copy; Cinnamon Lab</div>"
-    + "</body></html>";
-  var w = window.open("","_blank");
-  w.document.open(); w.document.write(content); w.document.close();
-  setTimeout(function(){ w.print(); }, 500);
-}
+        <div class="nav-buttons">
+            <div></div>
+            <button class="btn btn-primary" onclick="goToStep(2)">Next - Landed Cost</button>
+        </div>
+    </div>
 
-// ─── EXPORT EXCEL ─────────────────────────────────────────
-function exportExcel() {
-  if (!lastResults.length) { alert("Please run the analysis first."); return; }
-  var meta = lastMeta;
-  var wb   = XLSX.utils.book_new();
-  var header = ["SKU Name","RSP","RSP Ex.VAT","Supply Price","Landed Cost",
-    "Packaging","Labor","Ch. Logistics","Other","벤더수수료","FOC","TAC",
-    "Revenue","Gross Margin(%)","Trade Cost","GM After Trade(%)"];
-  var rows = [header];
-  for (var i = 0; i < lastResults.length; i++) {
-    var r = lastResults[i];
-    rows.push([r.name, r.rsp, Math.round(r.rspExVat), r.supply,
-      r.lc, r.packaging, r.labor, Math.round(r.logAmt),
-      r.other, Math.round(r.vendorAmt),
-      r.focPct, r.mfgPrice, r.qty,
-      Math.round(r.focPerUnit), Math.round(r.focTotal),
-      Math.round(r.tac),
-      Math.round(r.revenue), +(r.gm*100).toFixed(2),
-      Math.round(r.tradeAmt), +(r.gmAdj*100).toFixed(2)]);
-  }
-  var ws1 = XLSX.utils.aoa_to_sheet(rows);
-  XLSX.utils.book_append_sheet(wb, ws1, "Value Chain");
-  var info = [
-    ["항목","값"],
-    ["Brand", meta.brand], ["Origin Country", meta.country],
-    ["Channel Category", meta.cat], ["Retailer", meta.retailer],
-    ["GP (Retail Margin)", meta.gpPct + "%"],
-    ["Trade Conditions", meta.tradePct + "%"],
-    ["Total Channel Cost", (meta.gpPct+meta.tradePct) + "%"],
-    ["Add'l Ch. Logistics", meta.chLog + "%"],
-    ["Analysis Purpose", meta.purpose], ["메모", meta.memo||""],
-    ["분석일", new Date().toLocaleString("en-US")],
-    ["Built by", "Jacky J. Son - CSO - Global Business Team - Cinnamon Lab"]
-  ];
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(info), "기본정보");
-  var date = new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb, "ValueChain_" + meta.retailer + "_" + date + ".xlsx");
-}
+    <!-- Step 2: Landed Cost Calculator -->
+    <div class="step-content" id="step-2">
+        <div class="card">
+            <div class="card-title">Step 2: Landed Cost Calculator</div>
 
-// ─── PROMO TOGGLE ─────────────────────────────────────────
-function togglePromo() {
-  var yes = document.getElementById("promo-yes").checked;
-  document.getElementById("promo-form").style.display    = yes ? "block" : "none";
-  document.getElementById("promo-none-msg").style.display= yes ? "none"  : "block";
-}
-function updateOurBurden() {
-  var disc = parseFloat(document.getElementById("promo-discount").value)   || 0;
-  var chSup= parseFloat(document.getElementById("promo-ch-support").value) || 0;
-  var ours = Math.max(0, disc - chSup * disc / 100);
-  // simpler: our burden = disc * (1 - chSup/100)
-  var oursRate = disc * (1 - chSup / 100);
-  document.getElementById("burden-total").textContent   = disc.toFixed(1) + "%";
-  document.getElementById("burden-channel").textContent = (disc * chSup / 100).toFixed(1) + "%";
-  document.getElementById("burden-ours").textContent    = oursRate.toFixed(1) + "%";
-}
+            <div class="section">
+                <div class="section-title">Section A: Import Cost Parameters (Shared)</div>
 
-// ─── INIT ─────────────────────────────────────────────────
-addSKU();
-addSKU();
-</script>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="product-currency">Product Currency</label>
+                        <select id="product-currency" onchange="updateFXPlaceholder()">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="AUD">AUD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="JPY">JPY</option>
+                            <option value="CNY">CNY</option>
+                            <option value="KRW">KRW</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="incoterms">Incoterms</label>
+                        <select id="incoterms" onchange="updateIncotermDisplay()">
+                            <option value="FOB">FOB</option>
+                            <option value="EXW">EXW</option>
+                            <option value="CFR">CFR</option>
+                            <option value="CIF">CIF</option>
+                            <option value="DAP">DAP</option>
+                            <option value="DDP">DDP</option>
+                        </select>
+                        <div class="form-hint">Choose your pricing basis</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="base-fx-rate">Base FX Rate (KRW per <span id="fx-currency">USD</span>)</label>
+                        <input type="number" id="base-fx-rate" placeholder="1380" step="0.01">
+                        <div class="form-hint">Current market rate</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fx-spread">FX Spread %</label>
+                        <input type="number" id="fx-spread" placeholder="0" step="0.01" value="0">
+                        <div class="form-hint">Bank fee/spread applied to FX</div>
+                    </div>
+                </div>
+
+                <div id="freight-section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="freight-amount">Freight Amount in USD <span id="freight-method">(Ocean)</span></label>
+                            <input type="number" id="freight-amount" placeholder="2500" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="freight-method-select">Freight Method</label>
+                            <select id="freight-method-select" onchange="updateFreightDisplay()">
+                                <option value="ocean">Ocean</option>
+                                <option value="air">Air</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="duty-vat-section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="insurance-krw">Insurance (₩)</label>
+                            <input type="number" id="insurance-krw" placeholder="120000" step="1" value="0">
+                            <div class="form-hint">Total shipment insurance in KRW</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="duty-rate">HS Code Duty Rate %</label>
+                            <input type="number" id="duty-rate" placeholder="8" step="0.01" value="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="vat-rate">VAT Rate %</label>
+                            <input type="number" id="vat-rate" placeholder="10" step="0.01" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ancillary-rate">Ancillary Cost Rate %</label>
+                        <input type="number" id="ancillary-rate" placeholder="3" step="0.01" value="3">
+                        <div class="form-hint">Customs broker, trucking, inspection, etc.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-qty">Order Quantity (units)</label>
+                        <input type="number" id="order-qty" placeholder="3000" step="1" value="3000">
+                        <div class="form-hint">For freight allocation per unit</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SKU LC Table -->
+            <div class="section">
+                <div class="section-title">Section B: Multi-SKU Landed Cost</div>
+
+                <div class="summary-table">
+                    <table id="lc-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product Name</th>
+                                <th>SKU Code</th>
+                                <th>FOB Price</th>
+                                <th>Pack Size</th>
+                                <th>LC/unit (₩)</th>
+                                <th>LC/pack (₩)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="lc-tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline" onclick="addLCRow()">+ Add SKU</button>
+            </div>
+
+            <!-- Waterfall -->
+            <div id="waterfall-container" class="hidden">
+                <div class="section">
+                    <div class="section-title">Landed Cost Waterfall (First SKU)</div>
+                    <div id="waterfall-display"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">Next - SKU & Channel</button>
+        </div>
+    </div>
+
+    <!-- Step 3: SKU & Channel Setup -->
+    <div class="step-content" id="step-3">
+        <div class="card">
+            <div class="card-title">Step 3: SKU & Channel Setup</div>
+
+            <div class="section">
+                <div class="section-title">Part A: Channel Selection</div>
+                <div class="info-box">Select one or more retail channels. You can customize GP% for each.</div>
+
+                <div id="channel-list-container">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <button class="btn btn-outline" onclick="addChannel()">+ Add Another Channel</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Part B: SKU Value Chain Parameters</div>
+
+                <div class="summary-table">
+                    <table id="sku-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>SKU Name</th>
+                                <th>RSP (₩)</th>
+                                <th>LC/unit (₩)</th>
+                                <th>Packaging (₩)</th>
+                                <th>Labor (₩)</th>
+                                <th>Logistics %</th>
+                                <th>Vendor Fee %</th>
+                                <th>Other (₩)</th>
+                                <th>FOC %</th>
+                                <th>Mfg Supply (₩)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="sku-tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-outline" onclick="addSKURow()">+ Add SKU</button>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-outline" onclick="goToStep(2)">Back</button>
+            <button class="btn btn-primary" onclick="goToStep(4)">Next - Promotion</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Promotion -->
+    <div class="step-content" id="step-4">
+        <div class="card">
+            <div class="card-title">Step 4: Promotion (Optional)</div>
+
+            <div class="form-group">
+                <label>Apply Promotion?</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="promo-no" name="promo-toggle" value="no" checked onchange="updatePromoDisplay()">
+                        <label for="promo-no">No Promotion</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="promo-yes" name="promo-toggle" value="yes" onchange="updatePromoDisplay()">
+                        <label for="promo-yes">Apply Promotion</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="promo-section" class="hidden section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-name">Event Name</label>
+                        <input type="text" id="event-name" placeholder="e.g., Summer Sale">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-period">Event Period</label>
+                        <input type="text" id="event-period" placeholder="e.g., June 1-30, 2026">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discount-rate">Discount Rate % (on RSP)</label>
+                        <input type="number" id="discount-rate" placeholder="20" step="0.01" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="channel-support-rate">Channel Support Rate %</label>
+                        <input type="number" id="channel-support-rate" placeholder="50" step="0.01" value="50">
+                        <div class="form-hint">Channel's share of total discount burden</div>
+                    </div>
+                </div>
+
+                <div id="promo-preview" class="warning-box">
+                    Total Discount: 0 | Channel: 0 | Our Portion: 0
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="runAnalysis()">Run Analysis</button>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
+            <div></div>
+        </div>
+    </div>
+
+    <!-- Step 5: Results -->
+    <div class="step-content" id="step-5">
+        <div class="card">
+            <div class="card-title">Step 5: Analysis Results</div>
+
+            <div id="results-header" class="info-box"></div>
+            <div id="results-container"></div>
+
+            <div class="section">
+                <div class="section-title">Summary Comparison Table</div>
+                <div class="summary-table">
+                    <table id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Channel</th>
+                                <th>Retailer</th>
+                                <th>SKU</th>
+                                <th>RSP (₩)</th>
+                                <th>Supply Price (₩)</th>
+                                <th>LC (₩)</th>
+                                <th>TAC (₩)</th>
+                                <th>Revenue (₩)</th>
+                                <th>GM %</th>
+                                <th>GM % After Trade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveJSON()">Save as JSON</button>
+                <button class="btn btn-primary" onclick="exportExcel()">Export Excel</button>
+                <button class="btn btn-outline" onclick="window.print()">Print / PDF</button>
+                <button class="btn btn-outline" onclick="newAnalysis()">New Analysis</button>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-outline" onclick="goToStep(4)">Back</button>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Korea Channel Analyzer v2 | Built by Jacky J. Son · CSO · Global Business Team | © Cinnamon Lab · All rights reserved
+    </div>
+
+    <script>
+        // ============ DATA STRUCTURES ============
+        const CHANNEL_DATABASE = {
+            'E-Commerce': {
+                'Coupang': { gp: 12, trade: 20 },
+                'Naver Smart Store': { gp: 8, trade: 20 },
+                'Market Kurly': { gp: 37, trade: 5 },
+                'SSG.com (Shinsegae)': { gp: 15, trade: 12 },
+                'Olive Young Online': { gp: 38, trade: 12.5 },
+                '11STREET': { gp: 15, trade: 15 },
+                'Kakao Shopping': { gp: 12, trade: 10 }
+            },
+            'Convenience Store': {
+                'GS25': { gp: 45, trade: 12 },
+                'CU': { gp: 45, trade: 12 },
+                '7-Eleven': { gp: 45, trade: 12 },
+                'EMart24': { gp: 45, trade: 12 }
+            },
+            'Drug Store': {
+                'Olive Young (Offline)': { gp: 38, trade: 12.5 },
+                'LOHBs': { gp: 35, trade: 10 },
+                'Boots Korea': { gp: 35, trade: 10 }
+            },
+            'Hypermarket': {
+                'Homeplus': { gp: 40, trade: 8 },
+                'Lotte Mart': { gp: 40, trade: 8 },
+                'Emart': { gp: 40, trade: 8 },
+                'Hanaro Mart': { gp: 50, trade: 8 }
+            },
+            'Supermarket': {
+                'Emart Everyday': { gp: 40, trade: 11 },
+                'Homeplus Express': { gp: 40, trade: 11 },
+                'Lotte Super': { gp: 40, trade: 11 },
+                'GS Supermarket': { gp: 40, trade: 11 }
+            },
+            'Club Store': {
+                'Emart Traders': { gp: 16, trade: 7 },
+                'Costco Korea': { gp: 15, trade: 4 }
+            },
+            'Department Store': {
+                'Lotte Department': { gp: 40, trade: 12 },
+                'Hyundai Department': { gp: 40, trade: 12 },
+                'Shinsegae': { gp: 40, trade: 12 }
+            },
+            'Home Shopping': {
+                'Hyundai Home Shopping': { gp: 38, trade: 5 },
+                'CJ OnStyle': { gp: 38, trade: 5 },
+                'GS Shop': { gp: 38, trade: 5 },
+                'Lotte Home Shopping': { gp: 38, trade: 5 }
+            }
+        };
+
+        const FX_DEFAULTS = {
+            USD: 1380,
+            EUR: 1500,
+            AUD: 890,
+            GBP: 1750,
+            JPY: 9.2,
+            CNY: 190,
+            KRW: 1
+        };
+
+        let appState = {
+            basicInfo: {},
+            landedCost: { skus: [] },
+            channels: [],
+            skuParams: [],
+            promotion: {},
+            results: null
+        };
+
+        function initApp() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('analysis-date').value = today;
+            updateFXPlaceholder();
+            updateIncotermDisplay();
+            renderLCTable();
+            renderSKUTable();
+            renderChannelSelection();
+        }
+
+        function goToStep(step) {
+            if (step > getCurrentStep() && !validateStep(getCurrentStep())) {
+                alert('Please fill in required fields before proceeding.');
+                return;
+            }
+
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-' + step).classList.add('active');
+            updateStepIndicator(step);
+            window.scrollTo(0, 0);
+        }
+
+        function getCurrentStep() {
+            for (let i = 1; i <= 5; i++) {
+                if (document.getElementById('step-' + i).classList.contains('active')) {
+                    return i;
+                }
+            }
+            return 1;
+        }
+
+        function updateStepIndicator(activeStep) {
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById('step-dot-' + i);
+                const line = document.getElementById('step-line-' + i);
+
+                dot.classList.remove('active', 'done');
+                if (line) line.classList.remove('active');
+
+                if (i < activeStep) {
+                    dot.classList.add('done');
+                    if (line) line.classList.add('active');
+                } else if (i === activeStep) {
+                    dot.classList.add('active');
+                }
+            }
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                return document.getElementById('brand-name').value.trim() !== '' &&
+                       document.getElementById('origin-country').value.trim() !== '';
+            }
+            if (step === 2) {
+                return document.getElementById('base-fx-rate').value !== '' &&
+                       document.getElementById('order-qty').value !== '';
+            }
+            if (step === 3) {
+                return appState.channels.length > 0 && appState.skuParams.length > 0;
+            }
+            return true;
+        }
+
+        function loadSampleData() {
+            document.getElementById('brand-name').value = 'Cinnamon Lab';
+            document.getElementById('origin-country').value = 'USA';
+            document.getElementById('analysis-purpose').value = 'New Channel Evaluation';
+            document.getElementById('memo').value = 'Initial channel evaluation for 2026 expansion';
+
+            appState.landedCost.skus = [];
+            renderLCTable();
+            addLCRow();
+            addLCRow();
+
+            const rows = document.querySelectorAll('#lc-tbody tr');
+            rows[0].querySelector('[data-field="product-name"]').value = 'Whey Protein 500g';
+            rows[0].querySelector('[data-field="sku-code"]').value = 'WP-500';
+            rows[0].querySelector('[data-field="fob-price"]').value = 4.20;
+            rows[0].querySelector('[data-field="pack-size"]').value = 1;
+
+            rows[1].querySelector('[data-field="product-name"]').value = 'Protein Bar 6-Pack';
+            rows[1].querySelector('[data-field="sku-code"]').value = 'PB-6P';
+            rows[1].querySelector('[data-field="fob-price"]').value = 3.50;
+            rows[1].querySelector('[data-field="pack-size"]').value = 6;
+
+            document.getElementById('base-fx-rate').value = 1380;
+            document.getElementById('freight-amount').value = 2500;
+            document.getElementById('insurance-krw').value = 120000;
+            document.getElementById('duty-rate').value = 8;
+            document.getElementById('order-qty').value = 3000;
+
+            appState.channels = [];
+            renderChannelSelection();
+            addChannel();
+            addChannel();
+            addChannel();
+
+            setTimeout(() => {
+                const chSelects = document.querySelectorAll('[data-channel-category]');
+                if (chSelects.length >= 3) {
+                    chSelects[0].value = 'E-Commerce';
+                    updateChannelRetailers(chSelects[0]);
+                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[0].value = 'Coupang', 100);
+
+                    chSelects[1].value = 'Hypermarket';
+                    updateChannelRetailers(chSelects[1]);
+                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[1].value = 'Homeplus', 100);
+
+                    chSelects[2].value = 'Convenience Store';
+                    updateChannelRetailers(chSelects[2]);
+                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[2].value = 'GS25', 100);
+                }
+            }, 200);
+
+            appState.skuParams = [];
+            renderSKUTable();
+            addSKURow();
+            addSKURow();
+
+            const skuRows = document.querySelectorAll('#sku-tbody tr');
+            skuRows[0].querySelector('[data-field="sku-name"]').value = 'Whey Protein 500g';
+            skuRows[0].querySelector('[data-field="rsp"]').value = 39900;
+            skuRows[0].querySelector('[data-field="lc-unit"]').value = 5800;
+            skuRows[0].querySelector('[data-field="packaging"]').value = 500;
+            skuRows[0].querySelector('[data-field="labor"]').value = 300;
+            skuRows[0].querySelector('[data-field="logistics"]').value = 3;
+
+            skuRows[1].querySelector('[data-field="sku-name"]').value = 'Protein Bar 6-Pack';
+            skuRows[1].querySelector('[data-field="rsp"]').value = 89900;
+            skuRows[1].querySelector('[data-field="lc-unit"]').value = 5200;
+            skuRows[1].querySelector('[data-field="packaging"]').value = 800;
+            skuRows[1].querySelector('[data-field="labor"]').value = 400;
+            skuRows[1].querySelector('[data-field="logistics"]').value = 3;
+
+            document.getElementById('sample-data-info').classList.remove('hidden');
+        }
+
+        function loadJSONFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const state = JSON.parse(event.target.result);
+                        restoreState(state);
+                        goToStep(1);
+                        alert('JSON file loaded successfully!');
+                    } catch (err) {
+                        alert('Error loading JSON: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function updateFXPlaceholder() {
+            const curr = document.getElementById('product-currency').value;
+            const placeholder = FX_DEFAULTS[curr] || 1380;
+            document.getElementById('base-fx-rate').placeholder = placeholder.toString();
+            document.getElementById('fx-currency').textContent = curr;
+            if (!document.getElementById('base-fx-rate').value) {
+                document.getElementById('base-fx-rate').value = placeholder;
+            }
+        }
+
+        function updateIncotermDisplay() {
+            const inco = document.getElementById('incoterms').value;
+            const freightSec = document.getElementById('freight-section');
+            const dutyVatSec = document.getElementById('duty-vat-section');
+
+            if (['CFR', 'CIF', 'DAP', 'DDP'].includes(inco)) {
+                freightSec.style.opacity = '0.5';
+                freightSec.style.pointerEvents = 'none';
+            } else {
+                freightSec.style.opacity = '1';
+                freightSec.style.pointerEvents = 'auto';
+            }
+
+            if (inco === 'DDP') {
+                dutyVatSec.style.opacity = '0.5';
+                dutyVatSec.style.pointerEvents = 'none';
+            } else {
+                dutyVatSec.style.opacity = '1';
+                dutyVatSec.style.pointerEvents = 'auto';
+            }
+        }
+
+        function updateFreightDisplay() {
+            const method = document.getElementById('freight-method-select').value;
+            document.getElementById('freight-method').textContent = '(' + (method === 'ocean' ? 'Ocean' : 'Air') + ')';
+        }
+
+        function renderLCTable() {
+            const tbody = document.getElementById('lc-tbody');
+            tbody.innerHTML = '';
+            appState.landedCost.skus.forEach((sku, idx) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center">${idx + 1}</td>
+                    <td><input type="text" data-field="product-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
+                    <td><input type="text" data-field="sku-code" placeholder="e.g., WP-500" style="width:100%;"></td>
+                    <td><input type="number" data-field="fob-price" placeholder="4.20" step="0.01" style="width:100%;"></td>
+                    <td><input type="number" data-field="pack-size" placeholder="1" step="1" value="1" style="width:100%;"></td>
+                    <td class="text-right" data-field="lc-unit">0</td>
+                    <td class="text-right" data-field="lc-pack">0</td>
+                    <td class="text-center"><button class="btn btn-danger" onclick="removeLCRow(${idx})">x</button></td>
+                `;
+                tbody.appendChild(row);
+                
+                row.querySelectorAll('input').forEach(inp => {
+                    inp.addEventListener('input', () => {
+                        collectLCRowValues();
+                        updateLCCalculations();
+                    });
+                });
+
+                if (sku.productName) row.querySelector('[data-field="product-name"]').value = sku.productName;
+                if (sku.skuCode) row.querySelector('[data-field="sku-code"]').value = sku.skuCode;
+                if (sku.fobPrice) row.querySelector('[data-field="fob-price"]').value = sku.fobPrice;
+                if (sku.packSize) row.querySelector('[data-field="pack-size"]').value = sku.packSize;
+            });
+
+            updateLCCalculations();
+        }
+
+        function collectLCRowValues() {
+            const rows = document.querySelectorAll('#lc-tbody tr');
+            appState.landedCost.skus = Array.from(rows).map(row => ({
+                productName: row.querySelector('[data-field="product-name"]').value,
+                skuCode: row.querySelector('[data-field="sku-code"]').value,
+                fobPrice: parseFloat(row.querySelector('[data-field="fob-price"]').value) || 0,
+                packSize: parseFloat(row.querySelector('[data-field="pack-size"]').value) || 1
+            }));
+        }
+
+        function addLCRow() {
+            appState.landedCost.skus.push({});
+            renderLCTable();
+        }
+
+        function removeLCRow(idx) {
+            appState.landedCost.skus.splice(idx, 1);
+            renderLCTable();
+        }
+
+        function updateLCCalculations() {
+            const curr = document.getElementById('product-currency').value;
+            const baseFX = parseFloat(document.getElementById('base-fx-rate').value) || FX_DEFAULTS[curr];
+            const fxSpread = parseFloat(document.getElementById('fx-spread').value) || 0;
+            const effectiveFX = baseFX * (1 + fxSpread / 100);
+
+            const freightUSD = parseFloat(document.getElementById('freight-amount').value) || 0;
+            const effectiveFreightFX = effectiveFX;
+            const totalFreightKRW = freightUSD * effectiveFreightFX;
+
+            const insuranceKRW = parseFloat(document.getElementById('insurance-krw').value) || 0;
+            const orderQty = parseFloat(document.getElementById('order-qty').value) || 1;
+            const dutyRate = parseFloat(document.getElementById('duty-rate').value) || 0;
+            const vatRate = parseFloat(document.getElementById('vat-rate').value) || 10;
+            const ancRate = parseFloat(document.getElementById('ancillary-rate').value) || 0;
+
+            const rows = document.querySelectorAll('#lc-tbody tr');
+            rows.forEach((row, idx) => {
+                const fobPrice = parseFloat(row.querySelector('[data-field="fob-price"]').value) || 0;
+                const packSize = parseFloat(row.querySelector('[data-field="pack-size"]').value) || 1;
+
+                const freightPerUnit = totalFreightKRW / orderQty;
+                const insPerUnit = insuranceKRW / orderQty;
+                const fobUnitKRW = fobPrice * effectiveFX;
+                const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
+                const dutyUnit = cifUnit * (dutyRate / 100);
+                const ancUnit = cifUnit * (ancRate / 100);
+                const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
+                const lcPack = Math.round(lcExVat * packSize);
+
+                row.querySelector('[data-field="lc-unit"]').textContent = lcExVat.toLocaleString();
+                row.querySelector('[data-field="lc-pack"]').textContent = lcPack.toLocaleString();
+
+                if (appState.landedCost.skus[idx]) {
+                    appState.landedCost.skus[idx].lcUnit = lcExVat;
+                    appState.landedCost.skus[idx].lcPack = lcPack;
+                }
+            });
+
+            if (rows.length > 0) {
+                const firstRow = rows[0];
+                const fobPrice = parseFloat(firstRow.querySelector('[data-field="fob-price"]').value) || 0;
+                const packSize = parseFloat(firstRow.querySelector('[data-field="pack-size"]').value) || 1;
+
+                const freightPerUnit = totalFreightKRW / orderQty;
+                const insPerUnit = insuranceKRW / orderQty;
+                const fobUnitKRW = fobPrice * effectiveFX;
+                const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
+                const dutyUnit = cifUnit * (dutyRate / 100);
+                const ancUnit = cifUnit * (ancRate / 100);
+                const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
+                const lcIncVat = Math.round(lcExVat * (1 + vatRate / 100));
+
+                const waterfallHTML = `
+                    <div class="waterfall">
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">FOB Price (per unit)</div>
+                            <div class="waterfall-value">₩${Math.round(fobUnitKRW).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">+ Freight</div>
+                            <div class="waterfall-value">₩${Math.round(freightPerUnit).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">+ Insurance</div>
+                            <div class="waterfall-value">₩${Math.round(insPerUnit).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label"><strong>= CIF</strong></div>
+                            <div class="waterfall-value"><strong>₩${Math.round(cifUnit).toLocaleString()}</strong></div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">+ Import Duty (${dutyRate}%)</div>
+                            <div class="waterfall-value">₩${Math.round(dutyUnit).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">+ Ancillary Cost (${ancRate}%)</div>
+                            <div class="waterfall-value">₩${Math.round(ancUnit).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label"><strong>= LC ex.VAT</strong></div>
+                            <div class="waterfall-value"><strong style="color:#2b6cb0;">₩${lcExVat.toLocaleString()}</strong></div>
+                            <div class="waterfall-arrow"></div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label">+ Import VAT (${vatRate}%, recoverable)</div>
+                            <div class="waterfall-value">₩${Math.round(lcIncVat - lcExVat).toLocaleString()}</div>
+                            <div class="waterfall-arrow">↓</div>
+                        </div>
+                        <div class="waterfall-row">
+                            <div class="waterfall-label"><strong>= LC inc.VAT</strong></div>
+                            <div class="waterfall-value"><strong style="color:#f56565;">₩${lcIncVat.toLocaleString()}</strong></div>
+                            <div class="waterfall-arrow"></div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <strong>Note:</strong> LC ex.VAT (₩${lcExVat.toLocaleString()}) is the cost basis for Gross Margin calculation. Import VAT is recoverable.
+                    </div>
+                `;
+                document.getElementById('waterfall-display').innerHTML = waterfallHTML;
+                document.getElementById('waterfall-container').classList.remove('hidden');
+            }
+        }
+
+        function renderChannelSelection() {
+            const container = document.getElementById('channel-list-container');
+            container.innerHTML = '';
+            appState.channels.forEach((ch, idx) => {
+                const div = document.createElement('div');
+                div.className = 'section';
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div class="section-title" style="margin-bottom: 0;">Channel ${idx + 1}</div>
+                        <button class="btn btn-danger" onclick="removeChannel(${idx})">Remove</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select data-channel-category data-idx="${idx}" onchange="updateChannelRetailers(this)">
+                                <option value="">-- Select --</option>
+                                ${Object.keys(CHANNEL_DATABASE).map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Retailer</label>
+                            <select data-channel-retailer data-idx="${idx}" onchange="updateChannelGP(${idx})">
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>GP %</label>
+                            <input type="number" data-channel-gp data-idx="${idx}" step="0.01" onchange="saveChannelGP(${idx})">
+                        </div>
+                        <div class="form-group">
+                            <label>Trade % (Read-Only)</label>
+                            <div style="padding: 10px; background: #f7fafc; border-radius: 6px; border: 1px solid #cbd5e0;">
+                                <span data-channel-trade data-idx="${idx}" style="font-weight: 600; color: #2d3748;">--</span>%
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Add'l Logistics %</label>
+                            <input type="number" data-channel-logistics data-idx="${idx}" placeholder="0" step="0.01" value="0">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+
+                if (ch.category) {
+                    div.querySelector('[data-channel-category]').value = ch.category;
+                    updateChannelRetailers(div.querySelector('[data-channel-category]'));
+                    setTimeout(() => {
+                        if (ch.retailer) div.querySelector('[data-channel-retailer]').value = ch.retailer;
+                        if (ch.gp) div.querySelector('[data-channel-gp]').value = ch.gp;
+                        if (ch.logistics) div.querySelector('[data-channel-logistics]').value = ch.logistics;
+                    }, 100);
+                }
+            });
+        }
+
+        function updateChannelRetailers(select) {
+            const idx = select.getAttribute('data-idx');
+            const cat = select.value;
+            const retailerSelect = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`);
+            retailerSelect.innerHTML = '<option value="">-- Select --</option>';
+
+            if (cat && CHANNEL_DATABASE[cat]) {
+                Object.keys(CHANNEL_DATABASE[cat]).forEach(retailer => {
+                    const opt = document.createElement('option');
+                    opt.value = retailer;
+                    opt.textContent = retailer;
+                    retailerSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function updateChannelGP(idx) {
+            const cat = document.querySelector(`[data-channel-category][data-idx="${idx}"]`).value;
+            const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
+
+            if (cat && retailer && CHANNEL_DATABASE[cat][retailer]) {
+                const db = CHANNEL_DATABASE[cat][retailer];
+                document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value = db.gp;
+                document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent = db.trade;
+            }
+
+            saveChannelGP(idx);
+        }
+
+        function saveChannelGP(idx) {
+            const cat = document.querySelector(`[data-channel-category][data-idx="${idx}"]`).value;
+            const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
+            const gp = parseFloat(document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value) || 0;
+            const trade = parseFloat(document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent) || 0;
+            const logistics = parseFloat(document.querySelector(`[data-channel-logistics][data-idx="${idx}"]`).value) || 0;
+
+            appState.channels[idx] = { category: cat, retailer, gp, trade, logistics };
+        }
+
+        function addChannel() {
+            appState.channels.push({});
+            renderChannelSelection();
+        }
+
+        function removeChannel(idx) {
+            appState.channels.splice(idx, 1);
+            renderChannelSelection();
+        }
+
+        function renderSKUTable() {
+            const tbody = document.getElementById('sku-tbody');
+            tbody.innerHTML = '';
+            appState.skuParams.forEach((sku, idx) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center">${idx + 1}</td>
+                    <td><input type="text" data-field="sku-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
+                    <td><input type="number" data-field="rsp" placeholder="39900" step="1" style="width:100%;"></td>
+                    <td><input type="number" data-field="lc-unit" placeholder="5800" step="1" style="width:100%;"></td>
+                    <td><input type="number" data-field="packaging" placeholder="500" step="1" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="labor" placeholder="300" step="1" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="logistics" placeholder="3" step="0.01" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="vendor" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="other" placeholder="0" step="1" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="foc" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
+                    <td><input type="number" data-field="mfg-supply" placeholder="0" step="1" value="0" style="width:100%;"></td>
+                    <td class="text-center"><button class="btn btn-danger" onclick="removeSKURow(${idx})">x</button></td>
+                `;
+                tbody.appendChild(row);
+
+                if (sku.skuName) row.querySelector('[data-field="sku-name"]').value = sku.skuName;
+                if (sku.rsp) row.querySelector('[data-field="rsp"]').value = sku.rsp;
+                if (sku.lcUnit) row.querySelector('[data-field="lc-unit"]').value = sku.lcUnit;
+                if (sku.packaging) row.querySelector('[data-field="packaging"]').value = sku.packaging;
+                if (sku.labor) row.querySelector('[data-field="labor"]').value = sku.labor;
+                if (sku.logistics) row.querySelector('[data-field="logistics"]').value = sku.logistics;
+                if (sku.vendor) row.querySelector('[data-field="vendor"]').value = sku.vendor;
+                if (sku.other) row.querySelector('[data-field="other"]').value = sku.other;
+                if (sku.foc) row.querySelector('[data-field="foc"]').value = sku.foc;
+                if (sku.mfgSupply) row.querySelector('[data-field="mfg-supply"]').value = sku.mfgSupply;
+            });
+        }
+
+        function addSKURow() {
+            appState.skuParams.push({});
+            renderSKUTable();
+        }
+
+        function removeSKURow(idx) {
+            appState.skuParams.splice(idx, 1);
+            renderSKUTable();
+        }
+
+        function collectSKUParams() {
+            const rows = document.querySelectorAll('#sku-tbody tr');
+            appState.skuParams = Array.from(rows).map(row => ({
+                skuName: row.querySelector('[data-field="sku-name"]').value,
+                rsp: parseFloat(row.querySelector('[data-field="rsp"]').value) || 0,
+                lcUnit: parseFloat(row.querySelector('[data-field="lc-unit"]').value) || 0,
+                packaging: parseFloat(row.querySelector('[data-field="packaging"]').value) || 0,
+                labor: parseFloat(row.querySelector('[data-field="labor"]').value) || 0,
+                logistics: parseFloat(row.querySelector('[data-field="logistics"]').value) || 0,
+                vendor: parseFloat(row.querySelector('[data-field="vendor"]').value) || 0,
+                other: parseFloat(row.querySelector('[data-field="other"]').value) || 0,
+                foc: parseFloat(row.querySelector('[data-field="foc"]').value) || 0,
+                mfgSupply: parseFloat(row.querySelector('[data-field="mfg-supply"]').value) || 0
+            }));
+            return appState.skuParams;
+        }
+
+        function updatePromoDisplay() {
+            const isPromo = document.getElementById('promo-yes').checked;
+            document.getElementById('promo-section').classList.toggle('hidden', !isPromo);
+        }
+
+        function runAnalysis() {
+            appState.basicInfo = {
+                brandName: document.getElementById('brand-name').value,
+                originCountry: document.getElementById('origin-country').value,
+                analysisPurpose: document.getElementById('analysis-purpose').value,
+                analysisDate: document.getElementById('analysis-date').value,
+                memo: document.getElementById('memo').value
+            };
+
+            collectSKUParams();
+
+            appState.channels = [];
+            document.querySelectorAll('[data-channel-category]').forEach(cat => {
+                const idx = cat.getAttribute('data-idx');
+                const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
+                const gp = parseFloat(document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value) || 0;
+                const trade = parseFloat(document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent) || 0;
+                const logistics = parseFloat(document.querySelector(`[data-channel-logistics][data-idx="${idx}"]`).value) || 0;
+                if (cat.value && retailer) {
+                    appState.channels.push({ category: cat.value, retailer, gp, trade, logistics });
+                }
+            });
+
+            appState.promotion = {
+                active: document.getElementById('promo-yes').checked,
+                eventName: document.getElementById('event-name').value,
+                eventPeriod: document.getElementById('event-period').value,
+                discountRate: parseFloat(document.getElementById('discount-rate').value) || 0,
+                channelSupportRate: parseFloat(document.getElementById('channel-support-rate').value) || 0
+            };
+
+            const results = calculateResults();
+            appState.results = results;
+            renderResults(results);
+            goToStep(5);
+        }
+
+        function calculateResults() {
+            const results = [];
+
+            appState.channels.forEach((channel) => {
+                appState.skuParams.forEach((sku) => {
+                    if (!sku.skuName || !sku.rsp || !sku.lcUnit) return;
+
+                    const rsp = sku.rsp;
+                    const rspExVat = rsp / 1.1;
+                    const chLogRate = channel.logistics / 100;
+                    const supplyPrice = Math.round(rspExVat * (1 - channel.gp / 100 - chLogRate));
+
+                    const logAmt = supplyPrice * (sku.logistics / 100);
+                    const vendorAmt = supplyPrice * (sku.vendor / 100);
+                    const focAmt = sku.mfgSupply * (sku.foc / 100);
+                    const tac = Math.round(sku.lcUnit + sku.packaging + sku.labor + logAmt + sku.other + vendorAmt - focAmt);
+
+                    const grossRevenue = supplyPrice - tac;
+                    const gm = supplyPrice > 0 ? (grossRevenue / supplyPrice) * 100 : 0;
+
+                    const tradeAmt = supplyPrice * (channel.trade / 100);
+                    const grossRevenueAfterTrade = grossRevenue - tradeAmt;
+                    const gmAfterTrade = supplyPrice > 0 ? (grossRevenueAfterTrade / supplyPrice) * 100 : 0;
+
+                    results.push({
+                        channel: channel.category,
+                        retailer: channel.retailer,
+                        skuName: sku.skuName,
+                        rsp,
+                        rspExVat,
+                        supplyPrice,
+                        gpRate: channel.gp / 100,
+                        tradeRate: channel.trade / 100,
+                        chLogRate,
+                        gpAmt: Math.round(rspExVat * (channel.gp / 100)),
+                        logAmt: Math.round(logAmt),
+                        vendorAmt: Math.round(vendorAmt),
+                        focAmt: Math.round(focAmt),
+                        lcUnit: sku.lcUnit,
+                        packaging: sku.packaging,
+                        labor: sku.labor,
+                        other: sku.other,
+                        tac,
+                        grossRevenue,
+                        gm,
+                        tradeAmt: Math.round(tradeAmt),
+                        gmAfterTrade,
+                        normal: true
+                    });
+
+                    if (appState.promotion.active && appState.promotion.discountRate > 0) {
+                        const totalDisc = rsp * (appState.promotion.discountRate / 100);
+                        const ourBurden = totalDisc * (1 - appState.promotion.channelSupportRate / 100);
+                        const promoSupply = Math.round(supplyPrice - ourBurden);
+
+                        const promoLogAmt = promoSupply * (sku.logistics / 100);
+                        const promoVendorAmt = promoSupply * (sku.vendor / 100);
+                        const promoTac = Math.round(sku.lcUnit + sku.packaging + sku.labor + promoLogAmt + sku.other + promoVendorAmt - focAmt);
+
+                        const promoRevenue = promoSupply - promoTac;
+                        const promoGm = promoSupply > 0 ? (promoRevenue / promoSupply) * 100 : 0;
+
+                        const promoTradeAmt = promoSupply * (channel.trade / 100);
+                        const promoRevenueAfterTrade = promoRevenue - promoTradeAmt;
+                        const promoGmAfterTrade = promoSupply > 0 ? (promoRevenueAfterTrade / promoSupply) * 100 : 0;
+
+                        results.push({
+                            channel: channel.category,
+                            retailer: channel.retailer,
+                            skuName: sku.skuName,
+                            rsp: rsp * (1 - appState.promotion.discountRate / 100),
+                            rspExVat: rsp * (1 - appState.promotion.discountRate / 100) / 1.1,
+                            supplyPrice: promoSupply,
+                            gpRate: channel.gp / 100,
+                            tradeRate: channel.trade / 100,
+                            chLogRate,
+                            gpAmt: Math.round(rspExVat * (channel.gp / 100)),
+                            logAmt: Math.round(promoLogAmt),
+                            vendorAmt: Math.round(promoVendorAmt),
+                            focAmt: Math.round(focAmt),
+                            lcUnit: sku.lcUnit,
+                            packaging: sku.packaging,
+                            labor: sku.labor,
+                            other: sku.other,
+                            tac: promoTac,
+                            grossRevenue: promoRevenue,
+                            gm: promoGm,
+                            tradeAmt: Math.round(promoTradeAmt),
+                            gmAfterTrade: promoGmAfterTrade,
+                            normal: false
+                        });
+                    }
+                });
+            });
+
+            return results;
+        }
+
+        function renderResults(results) {
+            const channels = appState.channels.map(ch => `${ch.category}: ${ch.retailer}`).join(' | ');
+            const headerHTML = `
+                <strong>Date:</strong> ${appState.basicInfo.analysisDate} | 
+                <strong>Brand:</strong> ${appState.basicInfo.brandName} | 
+                <strong>Purpose:</strong> ${appState.basicInfo.analysisPurpose}<br>
+                <strong>Channels:</strong> ${channels}
+            `;
+            document.getElementById('results-header').innerHTML = headerHTML;
+
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            results.forEach((res) => {
+                const card = document.createElement('div');
+                card.className = 'sku-result' + (res.normal ? '' : ' sku-result-promo');
+
+                const gmPct = res.gm.toFixed(2);
+                const gmAfterTradePct = res.gmAfterTrade.toFixed(2);
+
+                let headerText = `${res.skuName} | ${res.retailer}`;
+                if (!res.normal) {
+                    headerText += ` [${appState.promotion.eventName || 'Promotion'}]`;
+                }
+
+                card.innerHTML = `
+                    <div class="sku-result-header">${headerText}</div>
+                    <div class="sku-result-body">
+                        <div class="sku-result-column">
+                            <div class="sku-result-column-title">Revenue Side</div>
+                            <div class="sku-result-line">
+                                <span>Consumer Price (RSP)</span>
+                                <span class="sku-result-line-value">₩${res.rsp.toLocaleString()}</span>
+                            </div>
+                            <div class="sku-result-line">
+                                <span>RSP Ex.VAT</span>
+                                <span class="sku-result-line-value">₩${Math.round(res.rspExVat).toLocaleString()}</span>
+                            </div>
+                            <div class="sku-result-line">
+                                <span>⟹ Channel GP (${(res.gpRate*100).toFixed(1)}%)</span>
+                                <span class="sku-result-line-value">-₩${res.gpAmt.toLocaleString()}</span>
+                            </div>
+                            ${res.chLogRate > 0 ? `
+                            <div class="sku-result-line">
+                                <span>⟹ Ch. Logistics (${(res.chLogRate*100).toFixed(1)}%)</span>
+                                <span class="sku-result-line-value">-₩${Math.round(res.rspExVat * res.chLogRate).toLocaleString()}</span>
+                            </div>` : ''}
+                            <div class="sku-result-divider"></div>
+                            <div class="sku-result-line sku-result-total">
+                                <span>Supply Price</span>
+                                <span>₩${res.supplyPrice.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div class="sku-result-column">
+                            <div class="sku-result-column-title">Cost Side / TAC</div>
+                            <div class="sku-result-line">
+                                <span>Landed Cost</span>
+                                <span class="sku-result-line-value">₩${res.lcUnit.toLocaleString()}</span>
+                            </div>
+                            <div class="sku-result-line">
+                                <span>Packaging</span>
+                                <span class="sku-result-line-value">₩${res.packaging.toLocaleString()}</span>
+                            </div>
+                            <div class="sku-result-line">
+                                <span>Labor</span>
+                                <span class="sku-result-line-value">₩${res.labor.toLocaleString()}</span>
+                            </div>
+                            ${res.logAmt > 0 ? `
+                                <div class="sku-result-line">
+                                    <span>Logistics (${(res.chLogRate*100).toFixed(1)}%)</span>
+                                    <span class="sku-result-line-value">₩${res.logAmt.toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                            ${res.vendorAmt > 0 ? `
+                                <div class="sku-result-line">
+                                    <span>Vendor Fee</span>
+                                    <span class="sku-result-line-value">₩${res.vendorAmt.toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                            ${res.other > 0 ? `
+                                <div class="sku-result-line">
+                                    <span>Other</span>
+                                    <span class="sku-result-line-value">₩${res.other.toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                            ${res.focAmt > 0 ? `
+                                <div class="sku-result-line">
+                                    <span>FOC Rebate</span>
+                                    <span class="sku-result-line-value">-₩${res.focAmt.toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                            <div class="sku-result-divider"></div>
+                            <div class="sku-result-line sku-result-total">
+                                <span>TAC</span>
+                                <span>₩${res.tac.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div class="sku-result-column">
+                            <div class="gm-box">
+                                <div class="gm-box-label">Gross Margin</div>
+                                <div class="gm-box-value">${gmPct}%</div>
+                                <div style="border-top:1px solid rgba(255,255,255,0.3); margin:12px 0;"></div>
+                                <div class="gm-box-label">After Trade</div>
+                                <div style="font-size:20px;font-weight:700;color:#ff6b6b;margin:8px 0;">${gmAfterTradePct}%</div>
+                                <div class="gm-box-subtitle">Trade: -₩${res.tradeAmt.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            const summaryBody = document.getElementById('summary-tbody');
+            summaryBody.innerHTML = '';
+            results.filter(r => r.normal).forEach(res => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${res.channel}</td>
+                    <td>${res.retailer}</td>
+                    <td>${res.skuName}</td>
+                    <td class="text-right">₩${res.rsp.toLocaleString()}</td>
+                    <td class="text-right">₩${res.supplyPrice.toLocaleString()}</td>
+                    <td class="text-right">₩${res.lcUnit.toLocaleString()}</td>
+                    <td class="text-right">₩${res.tac.toLocaleString()}</td>
+                    <td class="text-right">₩${res.grossRevenue.toLocaleString()}</td>
+                    <td class="text-right">${res.gm.toFixed(2)}%</td>
+                    <td class="text-right">${res.gmAfterTrade.toFixed(2)}%</td>
+                `;
+                summaryBody.appendChild(row);
+            });
+        }
+
+        function collectAllInputs() {
+            return {
+                basicInfo: {
+                    brandName: document.getElementById('brand-name').value,
+                    originCountry: document.getElementById('origin-country').value,
+                    analysisPurpose: document.getElementById('analysis-purpose').value,
+                    analysisDate: document.getElementById('analysis-date').value,
+                    memo: document.getElementById('memo').value
+                },
+                landedCost: {
+                    currency: document.getElementById('product-currency').value,
+                    incoterms: document.getElementById('incoterms').value,
+                    baseFX: document.getElementById('base-fx-rate').value,
+                    fxSpread: document.getElementById('fx-spread').value,
+                    freightAmount: document.getElementById('freight-amount').value,
+                    insuranceKRW: document.getElementById('insurance-krw').value,
+                    dutyRate: document.getElementById('duty-rate').value,
+                    vatRate: document.getElementById('vat-rate').value,
+                    ancRate: document.getElementById('ancillary-rate').value,
+                    orderQty: document.getElementById('order-qty').value,
+                    skus: appState.landedCost.skus
+                },
+                channels: appState.channels,
+                skuParams: appState.skuParams,
+                promotion: {
+                    active: document.getElementById('promo-yes').checked,
+                    eventName: document.getElementById('event-name').value,
+                    eventPeriod: document.getElementById('event-period').value,
+                    discountRate: document.getElementById('discount-rate').value,
+                    channelSupportRate: document.getElementById('channel-support-rate').value
+                }
+            };
+        }
+
+        function saveJSON() {
+            const state = collectAllInputs();
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'channel_analysis_' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function restoreState(state) {
+            if (state.basicInfo) {
+                document.getElementById('brand-name').value = state.basicInfo.brandName || '';
+                document.getElementById('origin-country').value = state.basicInfo.originCountry || '';
+                document.getElementById('analysis-purpose').value = state.basicInfo.analysisPurpose || '';
+                document.getElementById('analysis-date').value = state.basicInfo.analysisDate || '';
+                document.getElementById('memo').value = state.basicInfo.memo || '';
+            }
+
+            if (state.landedCost) {
+                document.getElementById('product-currency').value = state.landedCost.currency || 'USD';
+                document.getElementById('incoterms').value = state.landedCost.incoterms || 'FOB';
+                document.getElementById('base-fx-rate').value = state.landedCost.baseFX || '';
+                document.getElementById('fx-spread').value = state.landedCost.fxSpread || '0';
+                document.getElementById('freight-amount').value = state.landedCost.freightAmount || '';
+                document.getElementById('insurance-krw').value = state.landedCost.insuranceKRW || '0';
+                document.getElementById('duty-rate').value = state.landedCost.dutyRate || '8';
+                document.getElementById('vat-rate').value = state.landedCost.vatRate || '10';
+                document.getElementById('ancillary-rate').value = state.landedCost.ancRate || '3';
+                document.getElementById('order-qty').value = state.landedCost.orderQty || '3000';
+
+                appState.landedCost.skus = state.landedCost.skus || [];
+                renderLCTable();
+            }
+
+            if (state.channels) {
+                appState.channels = state.channels;
+                renderChannelSelection();
+            }
+
+            if (state.skuParams) {
+                appState.skuParams = state.skuParams;
+                renderSKUTable();
+            }
+
+            if (state.promotion) {
+                if (state.promotion.active) {
+                    document.getElementById('promo-yes').checked = true;
+                } else {
+                    document.getElementById('promo-no').checked = true;
+                }
+                document.getElementById('event-name').value = state.promotion.eventName || '';
+                document.getElementById('event-period').value = state.promotion.eventPeriod || '';
+                document.getElementById('discount-rate').value = state.promotion.discountRate || '0';
+                document.getElementById('channel-support-rate').value = state.promotion.channelSupportRate || '0';
+                updatePromoDisplay();
+            }
+
+            updateFXPlaceholder();
+            updateIncotermDisplay();
+        }
+
+        function exportExcel() {
+            const wb = XLSX.utils.book_new();
+
+            const summaryData = [];
+            summaryData.push([
+                'Channel', 'Retailer', 'SKU', 'RSP (KRW)', 'Supply Price (KRW)', 'LC (KRW)',
+                'TAC (KRW)', 'Revenue (KRW)', 'GM %', 'GM % After Trade'
+            ]);
+
+            appState.results.filter(r => r.normal).forEach(res => {
+                summaryData.push([
+                    res.channel,
+                    res.retailer,
+                    res.skuName,
+                    res.rsp,
+                    res.supplyPrice,
+                    res.lcUnit,
+                    res.tac,
+                    res.grossRevenue,
+                    res.gm.toFixed(2),
+                    res.gmAfterTrade.toFixed(2)
+                ]);
+            });
+
+            const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+
+            const detailsData = [];
+            detailsData.push([
+                'Channel', 'Retailer', 'SKU', 'RSP', 'Supply Price', 'LC', 'Packaging',
+                'Labor', 'Logistics', 'Vendor Fee', 'Other', 'FOC', 'TAC', 'Revenue', 'GM%'
+            ]);
+
+            appState.results.filter(r => r.normal).forEach(res => {
+                detailsData.push([
+                    res.channel,
+                    res.retailer,
+                    res.skuName,
+                    res.rsp,
+                    res.supplyPrice,
+                    res.lcUnit,
+                    res.packaging,
+                    res.labor,
+                    res.logAmt,
+                    res.vendorAmt,
+                    res.other,
+                    res.focAmt,
+                    res.tac,
+                    res.grossRevenue,
+                    res.gm.toFixed(2)
+                ]);
+            });
+
+            const ws2 = XLSX.utils.aoa_to_sheet(detailsData);
+            XLSX.utils.book_append_sheet(wb, ws2, 'Details');
+
+            XLSX.writeFile(wb, 'channel_analysis_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+        }
+
+        function newAnalysis() {
+            if (confirm('Start a new analysis? All current data will be cleared.')) {
+                appState = {
+                    basicInfo: {},
+                    landedCost: { skus: [] },
+                    channels: [],
+                    skuParams: [],
+                    promotion: {},
+                    results: null
+                };
+                document.getElementById('brand-name').value = '';
+                document.getElementById('origin-country').value = '';
+                document.getElementById('analysis-purpose').value = '';
+                document.getElementById('analysis-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('memo').value = '';
+                document.getElementById('promo-no').checked = true;
+                renderLCTable();
+                renderChannelSelection();
+                renderSKUTable();
+                updatePromoDisplay();
+                goToStep(1);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+
+        // ── Test / simulation hooks (safe to expose) ──────────────────────
+        window.appState         = appState;
+        window.calculateResults = calculateResults;
+    </script>
 </body>
 </html>
