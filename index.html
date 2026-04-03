@@ -3,2391 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korea Channel Analyzer v2</title>
+    <title>Enterprise Value Chain Master v5.2 - UI Bug Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
-            background: #eef2f7;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        body {
-            padding: 20px;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-            color: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.95;
-        }
-
-        /* Step Indicator */
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0;
-            gap: 0;
-            flex-wrap: wrap;
-        }
-
-        .step-dot {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            border: 2px solid #cbd5e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            color: #718096;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-dot.active {
-            background: #2b6cb0;
-            border-color: #2b6cb0;
-            color: white;
-            box-shadow: 0 0 0 4px rgba(43, 108, 176, 0.1);
-        }
-
-        .step-dot.done {
-            background: #48bb78;
-            border-color: #48bb78;
-            color: white;
-        }
-
-        .step-line {
-            height: 2px;
-            width: 60px;
-            background: #cbd5e0;
-            position: relative;
-            z-index: 1;
-            margin: 0 -8px;
-        }
-
-        .step-line.active {
-            background: #2b6cb0;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            padding: 26px 30px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1a365d;
-            border-bottom: 2px solid #ebf4ff;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 6px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 13px;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #2b6cb0;
-            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-hint {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 4px;
-        }
-
-        /* Checkboxes and Radios */
-        .checkbox-group,
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .checkbox-item,
-        .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        input[type="checkbox"],
-        input[type="radio"] {
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-        }
-
-        .checkbox-item label,
-        .radio-item label {
-            margin: 0;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-primary {
-            background: #2b6cb0;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2a5aa0;
-            box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
-        }
-
-        .btn-success {
-            background: #38a169;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #2f8659;
-            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
-        }
-
-        .btn-outline {
-            background: white;
-            color: #2b6cb0;
-            border: 1px solid #2b6cb0;
-        }
-
-        .btn-outline:hover {
-            background: #ebf4ff;
-        }
-
-        .btn-danger {
-            background: #f56565;
-            color: white;
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .btn-danger:hover {
-            background: #e53e3e;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Info and Warning Boxes */
-        .info-box {
-            background: #ebf8ff;
-            border-left: 4px solid #3182ce;
-            padding: 14px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin: 16px 0;
-            color: #1a365d;
-        }
-
-        .warning-box {
-            background: #fffbeb;
-            border-left: 4px solid #d69e2e;
-            padding: 14px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin: 16px 0;
-            color: #7c2d12;
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0;
-            font-size: 13px;
-        }
-
-        thead {
-            background: #f7fafc;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        tbody tr:hover {
-            background: #f7fafc;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        /* Step Content */
-        .step-content {
-            display: none;
-        }
-
-        .step-content.active {
-            display: block;
-        }
-
-        /* Inline Section */
-        .section {
-            margin-bottom: 28px;
-            padding: 20px;
-            background: #f7fafc;
-            border-radius: 8px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* SKU Result Cards */
-        .sku-result {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .sku-result-header {
-            background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .sku-result-body {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-        }
-
-        .sku-result-column {
-            padding: 20px;
-            border-right: 1px solid #e2e8f0;
-        }
-
-        .sku-result-column:last-child {
-            border-right: none;
-        }
-
-        .sku-result-column-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #718096;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .sku-result-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 13px;
-            color: #2d3748;
-        }
-
-        .sku-result-line-label {
-            font-weight: 500;
-        }
-
-        .sku-result-line-value {
-            font-weight: 600;
-            color: #1a365d;
-        }
-
-        .sku-result-divider {
-            border-top: 2px solid #e2e8f0;
-            margin: 12px 0;
-        }
-
-        .sku-result-total {
-            font-weight: 700;
-            color: #1a365d;
-            font-size: 14px;
-        }
-
-        /* GM Box */
-        .gm-box {
-            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 16px;
-        }
-
-        .gm-box-label {
-            font-size: 12px;
-            font-weight: 600;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .gm-box-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ffd700;
-        }
-
-        .gm-box-subtitle {
-            font-size: 11px;
-            opacity: 0.8;
-            margin-top: 8px;
-        }
-
-        /* Promo Result */
-        .sku-result-promo {
-            border: 2px solid #fc8181;
-        }
-
-        .sku-result-promo .sku-result-header {
-            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-        }
-
-        /* Waterfall Diagram */
-        .waterfall {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 16px 0;
-        }
-
-        .waterfall-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-
-        .waterfall-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .waterfall-value {
-            text-align: right;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a365d;
-        }
-
-        .waterfall-arrow {
-            text-align: center;
-            color: #a0aec0;
-            font-size: 16px;
-        }
-
-        /* Navigation */
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            color: #718096;
-            font-size: 12px;
-            margin-top: 40px;
-            padding: 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        /* Hidden */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .sku-result-body {
-                grid-template-columns: 1fr;
-            }
-
-            .sku-result-column {
-                border-right: none;
-                border-bottom: 1px solid #e2e8f0;
-            }
-
-            .sku-result-column:last-child {
-                border-bottom: none;
-            }
-
-            .waterfall-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .waterfall-arrow {
-                text-align: left;
-            }
-
-            .step-indicator {
-                font-size: 12px;
-            }
-
-            .step-dot {
-                width: 32px;
-                height: 32px;
-                font-size: 12px;
-            }
-
-            .step-line {
-                width: 40px;
-            }
-
-            .nav-buttons {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Print Styles */
-        /* ── Print / PDF — A4 Friendly ──────────────────────────────── */
-        .print-only { display: none; }
-
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 1.5cm 1.8cm 1.5cm 1.8cm;
-            }
-
-            /* ── Reset & base ── */
-            *, *::before, *::after { box-sizing: border-box; }
-            html, body {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                font-size: 10.5pt !important;
-                font-family: 'Segoe UI', 'Calibri', Arial, sans-serif !important;
-                color: #1a202c !important;
-            }
-
-            /* ── Hide everything except results ── */
-            .header,
-            .step-indicator,
-            .nav-buttons,
-            .btn-group,
-            .btn,
-            #step-1, #step-2, #step-3, #step-4,
-            .footer { display: none !important; }
-
-            /* ── Show print-only header ── */
-            .print-only { display: block !important; }
-
-            /* ── Step 5 (results) — always show in print ── */
-            #step-5 {
-                display: block !important;
-                padding: 0 !important;
-            }
-
-            /* ── Cards ── */
-            .card {
-                box-shadow: none !important;
-                border: 1px solid #cbd5e0 !important;
-                border-radius: 6px !important;
-                margin-bottom: 10pt !important;
-                padding: 10pt 12pt !important;
-                page-break-inside: avoid;
-            }
-            .card-title {
-                font-size: 11pt !important;
-                padding-bottom: 6pt !important;
-                margin-bottom: 10pt !important;
-            }
-
-            /* ── Result banner & meta ── */
-            .result-banner {
-                background: #1a365d !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                border-radius: 6px !important;
-                padding: 7pt 10pt !important;
-                font-size: 9.5pt !important;
-                margin-bottom: 8pt !important;
-            }
-
-            /* ── SKU result cards ── */
-            .sku-result {
-                box-shadow: none !important;
-                border: 1.5px solid #2b6cb0 !important;
-                border-radius: 8px !important;
-                margin-bottom: 10pt !important;
-                page-break-inside: avoid;
-                overflow: hidden;
-            }
-            .sku-result-header {
-                background: #1a365d !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                padding: 7pt 10pt !important;
-                font-size: 10.5pt !important;
-            }
-            .sku-result-body {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr 140pt !important;
-            }
-            .sku-result-column {
-                padding: 7pt 8pt !important;
-                border-right: 1px solid #e2e8f0 !important;
-            }
-            .sku-result-column:last-child { border-right: none !important; }
-            .sku-result-column-title {
-                font-size: 8pt !important;
-                font-weight: 700 !important;
-                margin-bottom: 5pt !important;
-            }
-            .sku-result-line {
-                font-size: 9pt !important;
-                padding: 2pt 0 !important;
-                display: flex !important;
-                justify-content: space-between !important;
-            }
-            .sku-result-total {
-                font-size: 9.5pt !important;
-                font-weight: 700 !important;
-                border-top: 1pt solid #cbd5e0 !important;
-                padding-top: 3pt !important;
-                margin-top: 2pt !important;
-            }
-            .sku-result-divider { border-top: 1px dashed #cbd5e0; margin: 3pt 0; }
-
-            /* ── GM Box (dark column) ── */
-            .gm-box {
-                background: #1a365d !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                padding: 10pt 8pt !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                gap: 4pt !important;
-            }
-            .gm-box-label {
-                font-size: 7.5pt !important;
-                color: #90cdf4 !important;
-                text-transform: uppercase;
-                letter-spacing: 0.4px;
-            }
-            .gm-box-value {
-                font-size: 22pt !important;
-                font-weight: 700 !important;
-                color: #ffd700 !important;
-            }
-            .gm-box-subtitle {
-                font-size: 8.5pt !important;
-                color: #bee3f8 !important;
-            }
-
-            /* ── Promo card ── */
-            .sku-result.sku-result-promo {
-                border-color: #c53030 !important;
-            }
-            .sku-result.sku-result-promo .sku-result-header {
-                background: #c53030 !important;
-            }
-            .sku-result.sku-result-promo .gm-box {
-                background: #c53030 !important;
-            }
-
-            /* ── Summary table ── */
-            .summary-table {
-                page-break-inside: auto !important;
-                overflow: visible !important;
-            }
-            .summary-table table {
-                width: 100% !important;
-                min-width: 0 !important;
-                font-size: 8.5pt !important;
-                border-collapse: collapse;
-            }
-            .summary-table th, .summary-table td {
-                padding: 4pt 5pt !important;
-                border: 0.5pt solid #cbd5e0 !important;
-                font-size: 8.5pt !important;
-            }
-            .summary-table th {
-                background: #2d3748 !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .summary-table tr { page-break-inside: avoid; }
-
-            /* ── Info/warning boxes: hide in print (no-print) ── */
-            .info-box, .warning-box { display: none !important; }
-
-            /* ── Misc ── */
-            a { color: inherit !important; text-decoration: none !important; }
-            .hidden { display: none !important; }
-        }
-
-        /* Summary table */
-        .summary-table {
-            font-size: 12px;
-            overflow-x: auto;
-        }
-
-        .summary-table table {
-            min-width: 800px;
-        }
+        :root { --primary: #1e3a8a; --secondary: #3b82f6; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #1e293b; padding: 20px; font-size: 14px; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, var(--primary) 100%); color: white; padding: 40px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
+        .header h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .guide-badge { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 30px; font-size: 12px; border: 1px solid rgba(255,255,255,0.3); }
+
+        .step-indicator { display: flex; justify-content: center; align-items: center; margin: 40px 0; }
+        .step-dot { width: 45px; height: 45px; border-radius: 50%; background: #fff; border: 3px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 800; position: relative; z-index: 2; transition: 0.3s; color: #94a3b8; }
+        .step-dot.active { border-color: var(--secondary); color: var(--secondary); transform: scale(1.1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .step-dot.done { background: var(--success); border-color: var(--success); color: white; }
+        .step-line { height: 4px; width: 70px; background: #e2e8f0; margin: 0 -5px; z-index: 1; }
+        .step-line.active { background: var(--secondary); }
+
+        .card { background: white; border-radius: 20px; padding: 35px; margin-bottom: 25px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; border-left: 6px solid var(--secondary); padding-left: 15px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 10px; font-size: 14px; transition: 0.2s; background: #f8fafc; }
+        input:focus { border-color: var(--secondary); background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .form-hint { font-size: 11px; color: #64748b; margin-top: 6px; font-style: italic; }
+
+        .tooltip { cursor: help; color: var(--secondary); font-weight: bold; margin-left: 5px; position: relative; display: inline-block; }
+        .tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 10px; border-radius: 8px; font-size: 11px; width: 200px; z-index: 100; font-weight: normal; line-height: 1.4; }
+
+        .fx-summary-display { background: #fefce8; border: 2px dashed #facc15; padding: 20px; border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .fx-val-box h5 { font-size: 11px; color: #854d0e; margin-bottom: 5px; }
+        .fx-val-box div { font-size: 20px; font-weight: 800; color: #1e293b; }
+
+        .btn { padding: 12px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--secondary); color: white; }
+        .btn-success { background: var(--success); color: white; width: 100%; justify-content: center; font-size: 18px; padding: 20px; }
+        .btn-outline { background: white; color: #475569; border: 1px solid #e2e8f0; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; margin: 20px 0; }
+        th { background: #f8fafc; padding: 14px; font-size: 11px; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; text-align: left; }
+        td { padding: 14px; border-bottom: 1px solid #f1f5f9; background: #fff; }
+
+        .step-content { display: none; animation: slideUp 0.4s ease; }
+        .step-content.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 50px; padding-top: 30px; border-top: 2px solid #f1f5f9; }
+        .chart-container { height: 450px; margin-top: 30px; }
+
+        @media print { .no-print { display: none !important; } .step-content { display: block !important; } }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Korea Retail Channel Value Chain Analyzer</h1>
-        <p>Professional FMCG Import Profitability Analysis Tool</p>
+    <div class="header no-print">
+        <div class="guide-badge">STABLE v5.2</div>
+        <h1>Enterprise Value Chain Master</h1>
+        <p>Integrated FMCG Profitability & CVS Promotion Simulation Tool.</p>
     </div>
 
-    <!-- Step Indicator -->
-    <div class="step-indicator">
-        <div class="step-dot active" id="step-dot-1">1</div>
-        <div class="step-line" id="step-line-1"></div>
-        <div class="step-dot" id="step-dot-2">2</div>
-        <div class="step-line" id="step-line-2"></div>
-        <div class="step-dot" id="step-dot-3">3</div>
-        <div class="step-line" id="step-line-3"></div>
-        <div class="step-dot" id="step-dot-4">4</div>
-        <div class="step-line" id="step-line-4"></div>
-        <div class="step-dot" id="step-dot-5">5</div>
+    <div class="step-indicator no-print">
+        <div class="step-dot active" id="dot-1">1</div><div class="step-line" id="line-1"></div>
+        <div class="step-dot" id="dot-2">2</div><div class="step-line" id="line-2"></div>
+        <div class="step-dot" id="dot-3">3</div><div class="step-line" id="line-3"></div>
+        <div class="step-dot" id="dot-4">4</div><div class="step-line" id="line-4"></div>
+        <div class="step-dot" id="dot-5">5</div>
     </div>
 
-    <!-- Step 1: Basic Info -->
+    <!-- STEP 1: CONTEXT -->
     <div class="step-content active" id="step-1">
         <div class="card">
-            <div class="card-title">Step 1: Basic Information</div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="brand-name">Brand Name</label>
-                    <input type="text" id="brand-name" placeholder="e.g., Cinnamon Lab">
+            <div class="card-title">🚀 Step 1: Analysis Setup</div>
+            <div class="grid">
+                <div class="field">
+                    <label>Project Name</label>
+                    <input type="text" id="project-name" placeholder="e.g., Global Launch Strategy">
                 </div>
-                <div class="form-group">
-                    <label for="origin-country">Origin Country</label>
-                    <input type="text" id="origin-country" placeholder="e.g., USA">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="analysis-purpose">Analysis Purpose</label>
-                    <select id="analysis-purpose">
-                        <option value="">-- Select Purpose --</option>
-                        <option value="New Channel Evaluation">New Channel Evaluation</option>
-                        <option value="Price Simulation">Price Simulation</option>
-                        <option value="Profitability Review">Profitability Review</option>
-                        <option value="Channel Comparison">Channel Comparison</option>
-                        <option value="Other">Other</option>
+                <div class="field">
+                    <label>GP Basis <span class="tooltip" data-tip="RSP Basis: Margin is a % of Consumer Price inc. VAT. Standard in Korean Retail.">?</span></label>
+                    <select id="gp-basis">
+                        <option value="RSP">RSP Basis (Korean Standard)</option>
+                        <option value="EXVAT">Supply Basis (Global Standard)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="analysis-date">Analysis Date</label>
-                    <input type="date" id="analysis-date">
+                <div class="field">
+                    <label>VAT Rate (%)</label>
+                    <input type="number" id="vat-rate" value="10">
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="memo">Memo / Note</label>
-                <textarea id="memo" placeholder="Optional notes about this analysis..."></textarea>
-            </div>
-
             <div class="btn-group">
-                <button class="btn btn-outline" onclick="loadSampleData()">Load Sample Data</button>
-                <button class="btn btn-outline" onclick="loadJSONFile()">Load JSON File</button>
+                <button class="btn btn-primary" onclick="loadSampleData()">Load Professional Sample</button>
+                <button class="btn btn-outline" onclick="clearData()">Clear All Data</button>
             </div>
-
-            <div id="sample-data-info" class="info-box hidden">Sample data has been loaded. Click "Next" to proceed.</div>
         </div>
-
-        <div class="nav-buttons">
-            <div></div>
-            <button class="btn btn-primary" onclick="goToStep(2)">Next - Landed Cost</button>
-        </div>
+        <div class="nav-buttons"><div></div><button class="btn btn-primary" onclick="goToStep(2)">Next: Landed Cost →</button></div>
     </div>
 
-    <!-- Step 2: Landed Cost Calculator -->
+    <!-- STEP 2: LANDED COST & DUAL FX -->
     <div class="step-content" id="step-2">
         <div class="card">
-            <div class="card-title">Step 2: Landed Cost Calculator</div>
-
-            <div class="section">
-                <div class="section-title">Section A: Import Cost Parameters (Shared)</div>
-                <div class="info-box" style="margin-bottom:14px">
-                    <strong>📦 What is Landed Cost?</strong><br>
-                    Landed Cost is the <strong>total per-unit cost</strong> to bring goods from an overseas supplier to a Korean warehouse.<br>
-                    It sums: FOB price (ex-factory/ship) + freight + insurance + import duty + ancillary clearance costs.
-                    This value becomes the <strong>foundational cost input</strong> for the Value Chain (TAC) analysis in Step 3.
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="product-currency">Product Currency</label>
-                        <select id="product-currency" onchange="updateFXPlaceholder()">
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="AUD">AUD</option>
-                            <option value="GBP">GBP</option>
-                            <option value="JPY">JPY</option>
-                            <option value="CNY">CNY</option>
-                            <option value="KRW">KRW</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="incoterms">Incoterms</label>
-                        <select id="incoterms" onchange="updateIncotermDisplay()">
-                            <option value="FOB">FOB</option>
-                            <option value="EXW">EXW</option>
-                            <option value="CFR">CFR</option>
-                            <option value="CIF">CIF</option>
-                            <option value="DAP">DAP</option>
-                            <option value="DDP">DDP</option>
-                        </select>
-                        <div class="form-hint">
-                            Trade terms for international pricing.<br>
-                            <strong>FOB</strong>: Seller bears costs to vessel loading — most common |
-                            <strong>CIF</strong>: Freight + insurance included (skip freight input) |
-                            <strong>DDP</strong>: Duties + VAT pre-paid by seller (skip duty input)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="base-fx-rate">Base FX Rate (KRW per <span id="fx-currency">USD</span>)</label>
-                        <input type="number" id="base-fx-rate" placeholder="1380" step="0.01">
-                        <div class="form-hint">
-                            📌 <strong>Always use the "Send (TT Selling)" rate, not the mid-market rate.</strong><br>
-                            This is the actual rate applied when remitting payment — slightly higher than the mid-market rate.<br>
-                            <a href="https://finance.naver.com/marketindex/" target="_blank" rel="noopener"
-                               style="color:#2b6cb0;font-weight:600;text-decoration:underline;">
-                               🔗 Check Naver FX rate →
-                            </a>
-                            &nbsp;(FX tab → select your currency → enter <strong>"Send (TT Selling)"</strong> rate)
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="fx-spread">FX Spread % <span style="font-weight:400;font-size:11px;color:#718096">(optional bank markup)</span></label>
-                        <input type="number" id="fx-spread" placeholder="0" step="0.01" value="0">
-                        <div class="form-hint">Enter any additional bank spread or FX markup (typically 0–1.5%). Enter 0 if you already used the Naver TT Selling rate.</div>
-                    </div>
-                </div>
-
-                <div id="freight-section">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="freight-amount">Freight Amount in USD <span id="freight-method">(Ocean)</span></label>
-                            <input type="number" id="freight-amount" placeholder="2500" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="freight-method-select">Freight Method</label>
-                            <select id="freight-method-select" onchange="updateFreightDisplay()">
-                                <option value="ocean">Ocean</option>
-                                <option value="air">Air</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="duty-vat-section">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="insurance-krw">Insurance (₩)</label>
-                            <input type="number" id="insurance-krw" placeholder="120000" step="1" value="0">
-                            <div class="form-hint">Total shipment insurance in KRW</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="duty-rate">HS Code Duty Rate %</label>
-                            <input type="number" id="duty-rate" placeholder="8" step="0.01" value="8">
-                            <div class="form-hint">Korean import duty rate. Common rates: Food/health supplements ~8%, Cosmetics ~6.5%. <a href="https://www.customs.go.kr/ftaportalkor/main.do" target="_blank" rel="noopener" style="color:#2b6cb0;">Korea Customs →</a></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="vat-rate">VAT Rate %</label>
-                            <input type="number" id="vat-rate" placeholder="10" step="0.01" value="10">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="ancillary-rate">Ancillary Cost &nbsp;
-                            <select id="anc-type" onchange="toggleAncType()" style="margin-left:4px;font-size:12px;border:1px solid #cbd5e0;border-radius:4px;padding:2px 6px;background:#fff;cursor:pointer;">
-                                <option value="pct">% of CIF</option>
-                                <option value="fixed">Fixed ₩</option>
-                            </select>
-                        </label>
-                        <input type="number" id="ancillary-rate" placeholder="3" step="0.01" value="3">
-                        <input type="number" id="ancillary-fixed" placeholder="50000" step="100" value="0" style="display:none;">
-                        <div class="form-hint" id="anc-hint-pct">Ancillary costs as % of CIF. Includes: customs brokerage fee, port/transport charges, inspection fees. Typically 2–4%.</div>
-                        <div class="form-hint" id="anc-hint-fixed" style="display:none;">Total ancillary cost as a fixed ₩ amount. Divided by order quantity to allocate per unit. (e.g., flat brokerage fee of ₩50,000)</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="order-qty">Order Quantity (units)</label>
-                        <input type="number" id="order-qty" placeholder="3000" step="1" value="3000">
-                        <div class="form-hint">For freight allocation per unit</div>
-                    </div>
+            <div class="card-title">🚢 Step 2: Advanced FX & Import Engine</div>
+            
+            <div style="background:#f1f5f9; padding:20px; border-radius:12px; margin-bottom:25px;">
+                <div class="field" style="max-width:300px;">
+                    <label>Unified FX Spread (%) <span class="tooltip" data-tip="Bank exchange fee & risk buffer. Added to both rates.">?</span></label>
+                    <input type="number" id="fx-spread" value="1.5" oninput="calculateLC()">
                 </div>
             </div>
 
-            <!-- SKU LC Table -->
-            <div class="section">
-                <div class="section-title">Section B: Multi-SKU Landed Cost</div>
-
-                <div class="summary-table">
-                    <table id="lc-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Product Name</th>
-                                <th>SKU Code</th>
-                                <th>FOB Price</th>
-                                <th>Pack Size</th>
-                                <th>LC/unit (₩)</th>
-                                <th>LC/pack (₩)</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="lc-tbody">
-                        </tbody>
-                    </table>
+            <div class="grid">
+                <div class="field">
+                    <label>Product PO Currency</label>
+                    <select id="po-currency" onchange="syncFXDefaults('po')">
+                        <option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option>
+                        <option value="JPY">JPY (¥)</option><option value="CNY">CNY (¥)</option><option value="THB">THB (฿)</option>
+                    </select>
                 </div>
-
-                <button class="btn btn-outline" onclick="addLCRow()">+ Add SKU</button>
-            </div>
-
-            <!-- Waterfall -->
-            <div id="waterfall-container" class="hidden">
-                <div class="section">
-                    <div class="section-title">Landed Cost Waterfall (First SKU)</div>
-                    <div id="waterfall-display"></div>
+                <div class="field">
+                    <label>Base FX Rate (PO) <a href="https://search.naver.com/search.naver?query=%ED%99%98%EC%9C%A8" target="_blank" style="font-size:10px; color:var(--secondary);">[Check Naver]</a></label>
+                    <input type="number" id="po-fx" step="0.01" oninput="calculateLC()">
+                </div>
+                <div class="field">
+                    <label>Freight Currency</label>
+                    <select id="fr-currency" onchange="syncFXDefaults('fr')">
+                        <option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Base FX Rate (Freight)</label>
+                    <input type="number" id="fr-fx" step="0.01" oninput="calculateLC()">
                 </div>
             </div>
+
+            <div class="fx-summary-display">
+                <div class="fx-val-box"><h5>EFFECTIVE PRODUCT FX:</h5><div id="eff-po-fx">₩0.00</div></div>
+                <div class="fx-val-box"><h5>EFFECTIVE FREIGHT FX:</h5><div id="eff-fr-fx">₩0.00</div></div>
+            </div>
+
+            <div class="grid" style="margin-top:25px; padding-top:25px; border-top:1px solid #eee;">
+                <div class="field">
+                    <label>Incoterms <span class="tooltip" data-tip="EXW/FOB: You pay freight. CIF/DAP: Unit price includes freight.">?</span></label>
+                    <select id="incoterms" onchange="toggleInco()"><option value="EXW">EXW</option><option value="FOB">FOB</option><option value="CIF">CIF</option><option value="DAP">DAP</option></select>
+                </div>
+                <div class="field" id="fr-input-group"><label>Total Freight Cost (FC)</label><input type="number" id="ttl-freight" value="0" oninput="calculateLC()"></div>
+                <div class="field"><label>Total Order Qty (Units)</label><input type="number" id="order-qty" value="1000" oninput="calculateLC()"></div>
+                <div class="field"><label>Global Ancillary (%)</label><input type="number" id="anc-pct" value="3" oninput="calculateLC()"></div>
+            </div>
+
+            <table>
+                <thead><tr><th>SKU Name</th><th>HS Code</th><th>Price (FC)</th><th>Tariff %</th><th>Pack Size</th><th>Effective LC (₩)</th><th>Action</th></tr></thead>
+                <tbody id="lc-tbody"></tbody>
+            </table>
+            <button class="btn btn-outline" onclick="addLCRow()">+ Add SKU Item</button>
         </div>
-
-        <div class="nav-buttons">
-            <button class="btn btn-outline" onclick="goToStep(1)">Back</button>
-            <button class="btn btn-primary" onclick="goToStep(3)">Next - SKU & Channel</button>
-        </div>
+        <div class="nav-buttons"><button class="btn btn-outline" onclick="goToStep(1)">← Back</button><button class="btn btn-primary" onclick="goToStep(3)">Next: Value Chain →</button></div>
     </div>
 
-    <!-- Step 3: SKU & Channel Setup -->
+    <!-- STEP 3: VALUE CHAIN -->
     <div class="step-content" id="step-3">
         <div class="card">
-            <div class="card-title">Step 3: SKU & Channel Setup</div>
+            <div class="card-title">📊 Step 3: Sales Channel Master</div>
+            <div id="channel-list"></div>
+            <button class="btn btn-outline" onclick="addChannel()">+ Add Channel</button>
 
-            <div class="section">
-                <div class="section-title">Part A: Channel Selection</div>
-                <div class="info-box">
-                    <strong>📊 What are GP% (Retailer Margin) and Trade% (Commercial Conditions)?</strong><br>
-                    <strong>GP%</strong> = The retailer's margin as a % of RSP (ex-VAT). Determines the supply price you receive.<br>
-                    <em>Supply Price = RSP ÷ 1.1 (ex-VAT) × (1 - GP%)</em><br>
-                    <strong>Trade%</strong> = Additional commercial conditions beyond GP% (e.g., promotional support, logistics pass-through).
-                    Deducted from supply price and <strong>shown separately in the GM% breakdown</strong>.<br>
-                    <em>Selecting a retailer pre-fills industry-standard values — adjust to reflect your actual contract terms</em>
-                </div>
-
-                <div id="channel-list-container">
-                    <!-- Dynamically populated -->
-                </div>
-
-                <button class="btn btn-outline" onclick="addChannel()">+ Add Another Channel</button>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Part B: SKU Value Chain Parameters</div>
-                <div class="info-box" style="margin-bottom:10px">
-                    <strong>💡 TAC (Total Acquisition Cost) Formula</strong><br>
-                    <em>TAC = Landed Cost x Sell Pack + Packaging + Labor + Channel Logistics + Other + Vendor Fee - FOC Rebate</em><br>
-                    <strong>Logistics</strong>: % of supply price or fixed KRW (channel-charged logistics, e.g., Coupang Rocket) |
-                    <strong>Vendor Fee%</strong>: % of supply price (dealer/agent commission) |
-                    <strong>FOC%</strong>: Free-of-charge rebate as % of Mfg Supply Price (cost deduction)
-                </div>
-                <div id="lc-import-bar" style="margin-bottom:8px;display:none">
-                    <button class="btn btn-outline" onclick="importAllFromLC()" style="background:#ebf8ff;border-color:#90cdf4;color:#2b6cb0;font-weight:600">
-                        📋 Auto-import SKUs from Landed Cost
-                    </button>
-                    <span style="font-size:11px;color:#718096;margin-left:8px"><- Bulk-import all SKUs calculated in Step 2</span>
-                </div>
-
-                <div class="summary-table">
-                    <table id="sku-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th title="← Import from LC">← LC SKU</th>
-                                <th>SKU Name</th>
-                                <th title="Retail Selling Price (VAT incl.)">RSP (₩)<br><span style="font-weight:400;font-size:9px">Consumer price</span></th>
-                                <th title="Landed Cost per unit (calculated in Step 2)">LC/unit (₩)<br><span style="font-weight:400;font-size:9px">Import cost</span></th>
-                                <th title="Units per selling package. e.g., 8-pack: enter 8. Landed Cost is multiplied accordingly." style="background:#fffbeb;">Sell Pack<br><span style="font-weight:400;font-size:9px">Units/pack</span></th>
-                                <th title="Packaging materials: bottles, boxes, labels etc.">Pkg (₩)<br><span style="font-weight:400;font-size:9px">Packaging</span></th>
-                                <th title="Labor for repacking, labeling, assembly etc.">Labor (₩)<br><span style="font-weight:400;font-size:9px">Labor cost</span></th>
-                                <th title="Channel logistics cost: % of supply or fixed KRW (e.g., Coupang Rocket)">Logistics<br><span style="font-weight:400;font-size:9px">Ch. logistics</span></th>
-                                <th title="Vendor/agent commission as % of supply price">Vendor %<br><span style="font-weight:400;font-size:9px">Agent fee</span></th>
-                                <th title="Other fixed costs per unit (KRW)">Other (₩)</th>
-                                <th title="FOC% x Mfg Supply Price = free-of-charge rebate deducted from TAC">FOC %<br><span style="font-weight:400;font-size:9px">Rebate</span></th>
-                                <th title="Manufacturer supply price for FOC rebate calculation (KRW)">Mfg Supply<br><span style="font-weight:400;font-size:9px">Mfg price</span></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="sku-tbody">
-                        </tbody>
-                    </table>
-                </div>
-
-                <button class="btn btn-outline" onclick="addSKURow()">+ Add SKU</button>
+            <div style="margin-top:40px;">
+                <div class="card-title">📦 Commercial Detail (per SKU)</div>
+                <table>
+                    <thead><tr><th>SKU</th><th>RSP (₩)</th><th>LC/Pack</th><th>Ads %</th><th>Logi %</th><th>Pkg ₩</th><th>Vendor %</th></tr></thead>
+                    <tbody id="sku-comm-tbody"></tbody>
+                </table>
             </div>
         </div>
-
-        <div class="nav-buttons">
-            <button class="btn btn-outline" onclick="goToStep(2)">Back</button>
-            <button class="btn btn-primary" onclick="goToStep(4)">Next - Promotion</button>
-        </div>
+        <div class="nav-buttons"><button class="btn btn-outline" onclick="goToStep(2)">← Back</button><button class="btn btn-primary" onclick="goToStep(4)">Next: Simulation →</button></div>
     </div>
 
-    <!-- Step 4: Promotion -->
+    <!-- STEP 4: SIMULATION -->
     <div class="step-content" id="step-4">
         <div class="card">
-            <div class="card-title">Step 4: Promotion (Optional)</div>
-
-            <div class="form-group">
-                <label>Apply Promotion?</label>
-                <div class="radio-group">
-                    <div class="radio-item">
-                        <input type="radio" id="promo-no" name="promo-toggle" value="no" checked onchange="updatePromoDisplay()">
-                        <label for="promo-no">No Promotion</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="promo-yes" name="promo-toggle" value="yes" onchange="updatePromoDisplay()">
-                        <label for="promo-yes">Apply Promotion</label>
-                    </div>
-                </div>
+            <div class="card-title">🎁 Step 4: Promotion & Risk Simulation</div>
+            <div class="grid">
+                <div class="field"><label>Promo Type</label><select id="promo-type"><option value="NONE">No Promo</option><option value="2PLUS1">CVS 2+1</option><option value="1PLUS1">CVS 1+1</option></select></div>
+                <div class="field"><label>Brand Split (%)</label><input type="number" id="p-split" value="50"></div>
+                <div class="field"><label>Risk Buffer (%)</label><input type="number" id="risk-buffer" value="5"></div>
             </div>
-
-            <div id="promo-section" class="hidden section">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="event-name">Event Name</label>
-                        <input type="text" id="event-name" placeholder="e.g., Summer Sale">
-                    </div>
-                    <div class="form-group">
-                        <label for="event-period">Event Period</label>
-                        <input type="text" id="event-period" placeholder="e.g., June 1-30, 2026">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="discount-rate">Discount Rate % (on RSP)</label>
-                        <input type="number" id="discount-rate" placeholder="20" step="0.01" value="20">
-                    </div>
-                    <div class="form-group">
-                        <label for="channel-support-rate">Channel Support Rate %</label>
-                        <input type="number" id="channel-support-rate" placeholder="50" step="0.01" value="50">
-                        <div class="form-hint">Channel's share of total discount burden</div>
-                    </div>
-                </div>
-
-                <div id="promo-preview" class="warning-box">
-                    Total Discount: 0 | Channel: 0 | Our Portion: 0
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn btn-success" onclick="runAnalysis()">Run Analysis</button>
-            </div>
+            <button class="btn btn-success" onclick="runFinalAnalysis()">🚀 EXECUTE FINAL ANALYSIS</button>
         </div>
-
-        <div class="nav-buttons">
-            <button class="btn btn-outline" onclick="goToStep(3)">Back</button>
-            <div></div>
-        </div>
+        <div class="nav-buttons"><button class="btn btn-outline" onclick="goToStep(3)">← Back</button><div></div></div>
     </div>
 
-    <!-- Step 5: Results -->
+    <!-- STEP 5: RESULTS -->
     <div class="step-content" id="step-5">
-        <!-- Print-only header — hidden on screen, visible when printing -->
-        <div class="print-only" id="print-header-box" style="
-            border:2px solid #1a365d;border-radius:8px;padding:10pt 14pt;margin-bottom:12pt;
-            display:flex;justify-content:space-between;align-items:center">
-            <div>
-                <div style="font-size:14pt;font-weight:800;color:#1a365d">Korea Retail Channel Value Chain Analyzer</div>
-                <div id="print-meta" style="font-size:9pt;color:#4a5568;margin-top:3pt"></div>
-            </div>
-            <div style="text-align:right;font-size:8.5pt;color:#718096">
-                Built by <strong>Jacky J. Son</strong> · CSO<br>© Cinnamon Lab
-            </div>
-        </div>
-
         <div class="card">
-            <div class="card-title">Step 5: Analysis Results</div>
-
-            <div id="results-header" class="info-box"></div>
-            <div id="results-container"></div>
-
-            <div class="section">
-                <div class="section-title">Summary Comparison Table</div>
-                <div class="summary-table">
-                    <table id="summary-table">
-                        <thead>
-                            <tr>
-                                <th>Channel</th>
-                                <th>Retailer</th>
-                                <th>SKU</th>
-                                <th>RSP (₩)</th>
-                                <th>Supply Price (₩)</th>
-                                <th>LC (₩)</th>
-                                <th>TAC (₩)</th>
-                                <th>Revenue (₩)</th>
-                                <th>GM %</th>
-                                <th>GM % After Trade</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summary-tbody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="saveJSON()">Save as JSON</button>
-                <button class="btn btn-primary" onclick="exportExcel()">Export Excel</button>
-                <button class="btn btn-outline" onclick="window.print()">Print / PDF</button>
-                <button class="btn btn-outline" onclick="newAnalysis()">New Analysis</button>
-            </div>
+            <div class="card-title">🏆 Step 5: Profitability Insight</div>
+            <div class="grid" id="summary-grid"></div>
+            <div class="chart-container"><canvas id="pnlChart"></canvas></div>
+            <div style="margin-top:40px;"><div class="card-title">📉 FX Sensitivity</div><div id="sensitivity-container"></div></div>
+            <div style="margin-top:40px;"><div class="card-title">📝 Final Waterfall P&L</div><table id="final-pnl-table"><thead><tr><th>Channel</th><th>SKU</th><th>RSP</th><th>Supply</th><th>Ads+Logi</th><th>Net Margin %</th><th>Promo GM %</th></tr></thead><tbody id="final-pnl-tbody"></tbody></table></div>
+            <div class="btn-group no-print"><button class="btn btn-primary" onclick="exportToExcel()">Export Excel</button><button class="btn btn-outline" onclick="window.print()">Print PDF</button></div>
         </div>
-
-        <div class="nav-buttons">
-            <button class="btn btn-outline" onclick="goToStep(4)">Back</button>
-            <div></div>
-        </div>
-    </div>
-
-    <div class="footer">
-        Korea Channel Analyzer v2 | Built by Jacky J. Son · CSO · Global Business Team | © Cinnamon Lab · All rights reserved
     </div>
 
     <script>
-        // ============ DATA STRUCTURES ============
-        const CHANNEL_DATABASE = {
-            'E-Commerce': {
-                'Coupang': { gp: 12, trade: 20 },
-                'Naver Smart Store': { gp: 8, trade: 20 },
-                'Market Kurly': { gp: 37, trade: 5 },
-                'SSG.com (Shinsegae)': { gp: 15, trade: 12 },
-                'Olive Young Online': { gp: 38, trade: 12.5 },
-                '11STREET': { gp: 15, trade: 15 },
-                'Kakao Shopping': { gp: 12, trade: 10 }
-            },
-            'Convenience Store': {
-                'GS25': { gp: 45, trade: 12 },
-                'CU': { gp: 45, trade: 12 },
-                '7-Eleven': { gp: 45, trade: 12 },
-                'EMart24': { gp: 45, trade: 12 }
-            },
-            'Drug Store': {
-                'Olive Young (Offline)': { gp: 38, trade: 12.5 },
-                'LOHBs': { gp: 35, trade: 10 },
-                'Boots Korea': { gp: 35, trade: 10 }
-            },
-            'Hypermarket': {
-                'Homeplus': { gp: 40, trade: 8 },
-                'Lotte Mart': { gp: 40, trade: 8 },
-                'Emart': { gp: 40, trade: 8 },
-                'Hanaro Mart': { gp: 50, trade: 8 }
-            },
-            'Supermarket': {
-                'Emart Everyday': { gp: 40, trade: 11 },
-                'Homeplus Express': { gp: 40, trade: 11 },
-                'Lotte Super': { gp: 40, trade: 11 },
-                'GS Supermarket': { gp: 40, trade: 11 }
-            },
-            'Club Store': {
-                'Emart Traders': { gp: 16, trade: 7 },
-                'Costco Korea': { gp: 15, trade: 4 }
-            },
-            'Department Store': {
-                'Lotte Department': { gp: 40, trade: 12 },
-                'Hyundai Department': { gp: 40, trade: 12 },
-                'Shinsegae': { gp: 40, trade: 12 }
-            },
-            'Home Shopping': {
-                'Hyundai Home Shopping': { gp: 38, trade: 5 },
-                'CJ OnStyle': { gp: 38, trade: 5 },
-                'GS Shop': { gp: 38, trade: 5 },
-                'Lotte Home Shopping': { gp: 38, trade: 5 }
-            }
+        const MASTER_FX = { USD: 1380, EUR: 1500, GBP: 1750, JPY: 9.2, CNY: 195, THB: 38 };
+        const CHANNEL_PRESETS = {
+            'Coupang': { gp: 15, ads: 20, logi: 3, trade: 0 },
+            'Olive Young': { gp: 38, ads: 10, logi: 5, trade: 12.5 },
+            'GS25 (CVS)': { gp: 45, ads: 5, logi: 3, trade: 12 },
+            'Costco': { gp: 13.9, ads: 4, logi: 3, trade: 0 }
         };
 
-        const FX_DEFAULTS = {
-            USD: 1380,
-            EUR: 1500,
-            AUD: 890,
-            GBP: 1750,
-            JPY: 9.2,
-            CNY: 190,
-            KRW: 1
-        };
+        let db = { skus: [], channels: [] };
 
-        let appState = {
-            basicInfo: {},
-            landedCost: { skus: [] },
-            channels: [],
-            skuParams: [],
-            promotion: {},
-            results: null
-        };
-
-        function initApp() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('analysis-date').value = today;
-            updateFXPlaceholder();
-            updateIncotermDisplay();
-            renderLCTable();
-            renderSKUTable();
-            renderChannelSelection();
+        function init() {
+            const saved = localStorage.getItem('kvc_v52');
+            if (saved) db = JSON.parse(saved);
+            else { addLCRow(); addChannel(); }
+            syncFXDefaults('po'); syncFXDefaults('fr');
+            renderAll();
         }
 
-        function goToStep(step) {
-            if (step > getCurrentStep() && !validateStep(getCurrentStep())) {
-                alert('Please fill in required fields before proceeding.');
-                return;
-            }
+        function save() { localStorage.setItem('kvc_v52', JSON.stringify(db)); }
 
-            // When entering Step 3: sync LC state first so the dropdown has fresh options
-            if (step === 3) {
-                collectLCRowValues();
-                updateLCCalculations();
-                renderSKUTable();  // rebuilds dropdown with latest LC SKUs
-            }
+        function syncFXDefaults(type) {
+            if (type === 'po') document.getElementById('po-fx').value = MASTER_FX[document.getElementById('po-currency').value] || 1300;
+            else document.getElementById('fr-fx').value = MASTER_FX[document.getElementById('fr-currency').value] || 1380;
+            calculateLC();
+        }
 
+        function toggleInco() { 
+            const i = document.getElementById('incoterms').value;
+            document.getElementById('fr-input-group').style.opacity = (i === 'CIF' || i === 'DAP') ? '0.3' : '1';
+            document.getElementById('ttl-freight').disabled = (i === 'CIF' || i === 'DAP');
+            calculateLC();
+        }
+
+        function goToStep(s) {
+            if (s === 3) renderCommercials();
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('step-' + step).classList.add('active');
-            updateStepIndicator(step);
-            window.scrollTo(0, 0);
+            document.getElementById('step-' + s).classList.add('active');
+            document.querySelectorAll('.step-dot').forEach((d, i) => {
+                d.classList.remove('active', 'done');
+                if (i+1 < s) d.classList.add('done');
+                if (i+1 === s) d.classList.add('active');
+            });
+            window.scrollTo(0,0);
         }
 
-        function getCurrentStep() {
-            for (let i = 1; i <= 5; i++) {
-                if (document.getElementById('step-' + i).classList.contains('active')) {
-                    return i;
-                }
-            }
-            return 1;
-        }
-
-        function updateStepIndicator(activeStep) {
-            for (let i = 1; i <= 5; i++) {
-                const dot = document.getElementById('step-dot-' + i);
-                const line = document.getElementById('step-line-' + i);
-
-                dot.classList.remove('active', 'done');
-                if (line) line.classList.remove('active');
-
-                if (i < activeStep) {
-                    dot.classList.add('done');
-                    if (line) line.classList.add('active');
-                } else if (i === activeStep) {
-                    dot.classList.add('active');
-                }
-            }
-        }
-
-        function validateStep(step) {
-            if (step === 1) {
-                return document.getElementById('brand-name').value.trim() !== '' &&
-                       document.getElementById('origin-country').value.trim() !== '';
-            }
-            if (step === 2) {
-                return document.getElementById('base-fx-rate').value !== '' &&
-                       document.getElementById('order-qty').value !== '';
-            }
-            if (step === 3) {
-                return appState.channels.length > 0 && appState.skuParams.length > 0;
-            }
-            return true;
-        }
-
-        function loadSampleData() {
-            document.getElementById('brand-name').value = 'Cinnamon Lab';
-            document.getElementById('origin-country').value = 'USA';
-            document.getElementById('analysis-purpose').value = 'New Channel Evaluation';
-            document.getElementById('memo').value = 'Initial channel evaluation for 2026 expansion';
-
-            appState.landedCost.skus = [];
-            renderLCTable();
-            addLCRow();
-            addLCRow();
-
-            const rows = document.querySelectorAll('#lc-tbody tr');
-            rows[0].querySelector('[data-field="product-name"]').value = 'Whey Protein 500g';
-            rows[0].querySelector('[data-field="sku-code"]').value = 'WP-500';
-            rows[0].querySelector('[data-field="fob-price"]').value = 4.20;
-            rows[0].querySelector('[data-field="pack-size"]').value = 1;
-
-            rows[1].querySelector('[data-field="product-name"]').value = 'Protein Bar 6-Pack';
-            rows[1].querySelector('[data-field="sku-code"]').value = 'PB-6P';
-            rows[1].querySelector('[data-field="fob-price"]').value = 3.50;
-            rows[1].querySelector('[data-field="pack-size"]').value = 6;
-
-            document.getElementById('base-fx-rate').value = 1380;
-            document.getElementById('freight-amount').value = 2500;
-            document.getElementById('insurance-krw').value = 120000;
-            document.getElementById('duty-rate').value = 8;
-            document.getElementById('order-qty').value = 3000;
-
-            appState.channels = [];
-            renderChannelSelection();
-            addChannel();
-            addChannel();
-            addChannel();
-
-            setTimeout(() => {
-                const chSelects = document.querySelectorAll('[data-channel-category]');
-                if (chSelects.length >= 3) {
-                    chSelects[0].value = 'E-Commerce';
-                    updateChannelRetailers(chSelects[0]);
-                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[0].value = 'Coupang', 100);
-
-                    chSelects[1].value = 'Hypermarket';
-                    updateChannelRetailers(chSelects[1]);
-                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[1].value = 'Homeplus', 100);
-
-                    chSelects[2].value = 'Convenience Store';
-                    updateChannelRetailers(chSelects[2]);
-                    setTimeout(() => document.querySelectorAll('[data-channel-retailer]')[2].value = 'GS25', 100);
-                }
-            }, 200);
-
-            appState.skuParams = [];
-            renderSKUTable();
-            addSKURow();
-            addSKURow();
-
-            const skuRows = document.querySelectorAll('#sku-tbody tr');
-            skuRows[0].querySelector('[data-field="sku-name"]').value = 'Whey Protein 500g';
-            skuRows[0].querySelector('[data-field="rsp"]').value = 39900;
-            skuRows[0].querySelector('[data-field="lc-unit"]').value = 5800;
-            skuRows[0].querySelector('[data-field="packaging"]').value = 500;
-            skuRows[0].querySelector('[data-field="labor"]').value = 300;
-            skuRows[0].querySelector('[data-field="logistics"]').value = 3;
-
-            skuRows[1].querySelector('[data-field="sku-name"]').value = 'Protein Bar 6-Pack';
-            skuRows[1].querySelector('[data-field="rsp"]').value = 89900;
-            skuRows[1].querySelector('[data-field="lc-unit"]').value = 5200;
-            skuRows[1].querySelector('[data-field="packaging"]').value = 800;
-            skuRows[1].querySelector('[data-field="labor"]').value = 400;
-            skuRows[1].querySelector('[data-field="logistics"]').value = 3;
-
-            document.getElementById('sample-data-info').classList.remove('hidden');
-        }
-
-        function loadJSONFile() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const state = JSON.parse(event.target.result);
-                        restoreState(state);
-                        goToStep(1);
-                        alert('JSON file loaded successfully!');
-                    } catch (err) {
-                        alert('Error loading JSON: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        function updateFXPlaceholder() {
-            const curr = document.getElementById('product-currency').value;
-            const placeholder = FX_DEFAULTS[curr] || 1380;
-            document.getElementById('base-fx-rate').placeholder = placeholder.toString();
-            document.getElementById('fx-currency').textContent = curr;
-            if (!document.getElementById('base-fx-rate').value) {
-                document.getElementById('base-fx-rate').value = placeholder;
-            }
-        }
-
-        function updateIncotermDisplay() {
-            const inco = document.getElementById('incoterms').value;
-            const freightSec = document.getElementById('freight-section');
-            const dutyVatSec = document.getElementById('duty-vat-section');
-
-            if (['CFR', 'CIF', 'DAP', 'DDP'].includes(inco)) {
-                freightSec.style.opacity = '0.5';
-                freightSec.style.pointerEvents = 'none';
-            } else {
-                freightSec.style.opacity = '1';
-                freightSec.style.pointerEvents = 'auto';
-            }
-
-            if (inco === 'DDP') {
-                dutyVatSec.style.opacity = '0.5';
-                dutyVatSec.style.pointerEvents = 'none';
-            } else {
-                dutyVatSec.style.opacity = '1';
-                dutyVatSec.style.pointerEvents = 'auto';
-            }
-        }
-
-        function updateFreightDisplay() {
-            const method = document.getElementById('freight-method-select').value;
-            document.getElementById('freight-method').textContent = '(' + (method === 'ocean' ? 'Ocean' : 'Air') + ')';
-        }
-
+        function addLCRow() { db.skus.push({ name: '', hs: '', fob: 0, tariff: 8, pack: 24, ads: 0, log: 3, pkg: 0, vendor: 0, rsp: 0 }); renderLCTable(); }
+        
         function renderLCTable() {
-            const tbody = document.getElementById('lc-tbody');
-            tbody.innerHTML = '';
-            appState.landedCost.skus.forEach((sku, idx) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="text-center">${idx + 1}</td>
-                    <td><input type="text" data-field="product-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
-                    <td><input type="text" data-field="sku-code" placeholder="e.g., WP-500" style="width:100%;"></td>
-                    <td><input type="number" data-field="fob-price" placeholder="4.20" step="0.01" style="width:100%;"></td>
-                    <td><input type="number" data-field="pack-size" placeholder="1" step="1" value="1" style="width:100%;"></td>
-                    <td class="text-right" data-field="lc-unit">0</td>
-                    <td class="text-right" data-field="lc-pack">0</td>
-                    <td class="text-center"><button class="btn btn-danger" onclick="removeLCRow(${idx})">x</button></td>
-                `;
-                tbody.appendChild(row);
+            const tbody = document.getElementById('lc-tbody'); tbody.innerHTML = '';
+            db.skus.forEach((s, i) => {
+                tbody.innerHTML += `<tr>
+                    <td><input type="text" value="${s.name}" onchange="db.skus[${i}].name=this.value;save();"></td>
+                    <td><input type="text" value="${s.hs}" onchange="db.skus[${i}].hs=this.value;save();"></td>
+                    <td><input type="number" value="${s.fob}" oninput="db.skus[${i}].fob=parseFloat(this.value);calculateLC();save();"></td>
+                    <td><input type="number" value="${s.tariff}" oninput="db.skus[${i}].tariff=parseFloat(this.value);calculateLC();save();"></td>
+                    <td><input type="number" value="${s.pack}" oninput="db.skus[${i}].pack=parseFloat(this.value);calculateLC();save();"></td>
+                    <td id="lc-cell-${i}" style="font-weight:800;color:var(--secondary);">₩0</td>
+                    <td><button class="btn" style="background:var(--danger);color:white;padding:5px 10px;" onclick="db.skus.splice(${i},1);renderLCTable();save();">×</button></td>
+                </tr>`;
+            });
+            calculateLC();
+        }
+
+        function calculateLC() {
+            const spr = (parseFloat(document.getElementById('fx-spread').value) || 0) / 100;
+            const poFx = (parseFloat(document.getElementById('po-fx').value) || 1) * (1 + spr);
+            const frFx = (parseFloat(document.getElementById('fr-fx').value) || 1) * (1 + spr);
+            
+            document.getElementById('eff-po-fx').innerText = '₩' + poFx.toLocaleString();
+            document.getElementById('eff-fr-fx').innerText = '₩' + frFx.toLocaleString();
+
+            const frT = parseFloat(document.getElementById('ttl-freight').value) || 0;
+            const qty = parseFloat(document.getElementById('order-qty').value) || 1;
+            const anc = (parseFloat(document.getElementById('anc-pct').value) || 0) / 100;
+            const inco = document.getElementById('incoterms').value;
+
+            db.skus.forEach((s, i) => {
+                const prodKRW = (s.fob || 0) * poFx;
+                const frUnitKRW = (inco === 'CIF' || inco === 'DAP') ? 0 : (frT * frFx / qty);
+                const cifKRW = prodKRW + (frT * frFx / qty); // Base for customs
+                const duty = cifKRW * ((s.tariff || 0) / 100);
+                const aCost = cifKRW * anc;
                 
-                row.querySelectorAll('input').forEach(inp => {
-                    inp.addEventListener('input', () => {
-                        collectLCRowValues();
-                        updateLCCalculations();
-                    });
+                s.lcUnit = prodKRW + frUnitKRW + duty + aCost;
+                s.lcPack = s.lcUnit * (s.pack || 1);
+                
+                const cell = document.getElementById('lc-cell-' + i);
+                if (cell) cell.innerText = '₩' + Math.round(s.lcPack).toLocaleString();
+            });
+        }
+
+        function addChannel() { db.channels.push({ name: 'Coupang', ...CHANNEL_PRESETS['Coupang'] }); renderChannels(); }
+        function renderChannels() {
+            const container = document.getElementById('channel-list'); container.innerHTML = '';
+            db.channels.forEach((ch, i) => {
+                container.innerHTML += `<div class="card" style="border-left:8px solid var(--secondary);">
+                    <div class="grid">
+                        <div class="field"><label>Retailer</label><select onchange="applyP(${i}, this.value)">${Object.keys(CHANNEL_PRESETS).map(k => `<option value="${k}" ${ch.name === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
+                        <div class="field"><label>Retail Margin%</label><input type="number" value="${ch.gp}" onchange="db.channels[${i}].gp=parseFloat(this.value);save();"></div>
+                        <div class="field"><label>Ads%</label><input type="number" value="${ch.ads}" onchange="db.channels[${i}].ads=parseFloat(this.value);save();"></div>
+                        <div class="field"><label>Trade Term%</label><input type="number" value="${ch.trade}" onchange="db.channels[${i}].trade=parseFloat(this.value);save();"></div>
+                        <div class="field"><label>&nbsp;</label><button class="btn" style="background:var(--danger);color:white;width:100%;" onclick="db.channels.splice(${i},1);renderChannels();save();">Remove</button></div>
+                    </div>
+                </div>`;
+            });
+        }
+        function applyP(i, k) { db.channels[i] = { name: k, ...CHANNEL_PRESETS[k] }; renderChannels(); save(); }
+
+        function renderCommercials() {
+            const tbody = document.getElementById('sku-comm-tbody'); tbody.innerHTML = '';
+            db.skus.forEach((s, i) => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${s.name || 'SKU'}</strong></td>
+                    <td><input type="number" value="${s.rsp}" onchange="db.skus[${i}].rsp=parseFloat(this.value);save();"></td>
+                    <td>₩${Math.round(s.lcPack || 0).toLocaleString()}</td>
+                    <td><input type="number" value="${s.ads}" onchange="db.skus[${i}].ads=parseFloat(this.value);save();"></td>
+                    <td><input type="number" value="${s.log}" onchange="db.skus[${i}].log=parseFloat(this.value);save();"></td>
+                    <td><input type="number" value="${s.pkg}" onchange="db.skus[${i}].pkg=parseFloat(this.value);save();"></td>
+                    <td><input type="number" value="${s.vendor}" onchange="db.skus[${i}].vendor=parseFloat(this.value);save();"></td>
+                </tr>`;
+            });
+        }
+
+        function runFinalAnalysis() {
+            calculateLC();
+            const res = [];
+            const pType = document.getElementById('promo-type').value;
+            const pSplit = (parseFloat(document.getElementById('p-split').value) || 0) / 100;
+            const riskB = (parseFloat(document.getElementById('risk-buffer').value) || 0) / 100;
+
+            db.channels.forEach(ch => {
+                db.skus.forEach(sku => {
+                    const rsp = sku.rsp || 0;
+                    let sp = (rsp * (1 - ch.gp/100)) / 1.1;
+                    let spP = sp;
+                    if (pType === '2PLUS1') spP = sp - ((sp * pSplit) / 3);
+                    else if (pType === '1PLUS1') spP = sp - ((sp * pSplit) / 2);
+
+                    const ads = (rsp/1.1) * (ch.ads/100) + (sp * (sku.ads/100));
+                    const logi = (sp * (sku.log/100)) + (sp * 0.03); // Simplified channel logi
+                    const ttlCost = sku.lcPack + ads + logi + (sp * riskB) + (sku.pkg || 0) + (sp * (ch.trade/100));
+                    const net = sp - ttlCost;
+                    res.push({ ch: ch.name, sku: sku.name, rsp, sp, costs: ttlCost, gm: (net/sp*100), gmP: ((spP - ttlCost)/spP*100) });
                 });
-
-                if (sku.productName) row.querySelector('[data-field="product-name"]').value = sku.productName;
-                if (sku.skuCode) row.querySelector('[data-field="sku-code"]').value = sku.skuCode;
-                if (sku.fobPrice) row.querySelector('[data-field="fob-price"]').value = sku.fobPrice;
-                if (sku.packSize) row.querySelector('[data-field="pack-size"]').value = sku.packSize;
             });
-
-            updateLCCalculations();
+            renderResults(res);
         }
 
-        function collectLCRowValues() {
-            const rows = document.querySelectorAll('#lc-tbody tr');
-            appState.landedCost.skus = Array.from(rows).map(row => ({
-                productName: row.querySelector('[data-field="product-name"]').value,
-                skuCode: row.querySelector('[data-field="sku-code"]').value,
-                fobPrice: parseFloat(row.querySelector('[data-field="fob-price"]').value) || 0,
-                packSize: parseFloat(row.querySelector('[data-field="pack-size"]').value) || 1
-            }));
-        }
-
-        function addLCRow() {
-            appState.landedCost.skus.push({});
-            renderLCTable();
-        }
-
-        function removeLCRow(idx) {
-            appState.landedCost.skus.splice(idx, 1);
-            renderLCTable();
-        }
-
-        function updateEffLCDisplay(row) {
-            const lcVal  = parseFloat(row.querySelector('[data-field="lc-unit"]').value) || 0;
-            const packEl = row.querySelector('[data-field="vc-pack-size"]');
-            const pack   = parseFloat(packEl ? packEl.value : 1) || 1;
-            const dispEl = row.querySelector('[data-field="eff-lc-display"]');
-            if (!dispEl) return;
-            if (lcVal > 0 && pack > 1) {
-                dispEl.textContent = '= ₩' + Math.round(lcVal * pack).toLocaleString() + ' (×' + pack + ')';
-            } else {
-                dispEl.textContent = '';
-            }
-        }
-
-        function toggleAncType() {
-            const type = (document.getElementById('anc-type') || {}).value || 'pct';
-            const rateEl = document.getElementById('ancillary-rate');
-            const fixedEl = document.getElementById('ancillary-fixed');
-            const hintPct = document.getElementById('anc-hint-pct');
-            const hintFixed = document.getElementById('anc-hint-fixed');
-            if (rateEl) rateEl.style.display = type === 'pct' ? '' : 'none';
-            if (fixedEl) fixedEl.style.display = type === 'fixed' ? '' : 'none';
-            if (hintPct) hintPct.style.display = type === 'pct' ? '' : 'none';
-            if (hintFixed) hintFixed.style.display = type === 'fixed' ? '' : 'none';
-            updateLCCalculations();
-        }
-
-        function updateLCCalculations() {
-            const curr = document.getElementById('product-currency').value;
-            const baseFX = parseFloat(document.getElementById('base-fx-rate').value) || FX_DEFAULTS[curr];
-            const fxSpread = parseFloat(document.getElementById('fx-spread').value) || 0;
-            const effectiveFX = baseFX * (1 + fxSpread / 100);
-
-            const freightUSD = parseFloat(document.getElementById('freight-amount').value) || 0;
-            const effectiveFreightFX = effectiveFX;
-            const totalFreightKRW = freightUSD * effectiveFreightFX;
-
-            const insuranceKRW = parseFloat(document.getElementById('insurance-krw').value) || 0;
-            const orderQty = parseFloat(document.getElementById('order-qty').value) || 1;
-            const dutyRate = parseFloat(document.getElementById('duty-rate').value) || 0;
-            const vatRate = parseFloat(document.getElementById('vat-rate').value) || 10;
-            const ancType = (document.getElementById('anc-type') || {}).value || 'pct';
-            const ancRate = ancType === 'pct' ? (parseFloat(document.getElementById('ancillary-rate').value) || 0) : 0;
-            const ancFixed = ancType === 'fixed' ? (parseFloat(document.getElementById('ancillary-fixed').value) || 0) : 0;
-
-            const rows = document.querySelectorAll('#lc-tbody tr');
-            rows.forEach((row, idx) => {
-                const fobPrice = parseFloat(row.querySelector('[data-field="fob-price"]').value) || 0;
-                const packSize = parseFloat(row.querySelector('[data-field="pack-size"]').value) || 1;
-
-                const freightPerUnit = totalFreightKRW / orderQty;
-                const insPerUnit = insuranceKRW / orderQty;
-                const fobUnitKRW = fobPrice * effectiveFX;
-                const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
-                const dutyUnit = cifUnit * (dutyRate / 100);
-                const ancUnit = ancType === 'fixed' ? (ancFixed / orderQty) : cifUnit * (ancRate / 100);
-                const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
-                const lcPack = Math.round(lcExVat * packSize);
-
-                row.querySelector('[data-field="lc-unit"]').textContent = lcExVat.toLocaleString();
-                row.querySelector('[data-field="lc-pack"]').textContent = lcPack.toLocaleString();
-
-                if (appState.landedCost.skus[idx]) {
-                    appState.landedCost.skus[idx].lcUnit = lcExVat;
-                    appState.landedCost.skus[idx].lcPack = lcPack;
-                }
+        function renderResults(res) {
+            const grid = document.getElementById('summary-grid');
+            const avg = res.reduce((a,b) => a + b.gm, 0) / res.length;
+            grid.innerHTML = `<div class="result-card"><h4>Avg. Net Margin</h4><div class="val" style="color:${avg > 15 ? 'var(--success)' : 'var(--danger)'}">${avg.toFixed(1)}%</div></div>`;
+            const tbody = document.getElementById('final-pnl-tbody'); tbody.innerHTML = '';
+            res.forEach(r => {
+                tbody.innerHTML += `<tr><td><strong>${r.ch}</strong></td><td>${r.sku}</td><td>₩${Math.round(r.rsp).toLocaleString()}</td><td>₩${Math.round(r.sp).toLocaleString()}</td><td>₩${Math.round(r.costs).toLocaleString()}</td><td style="font-weight:bold;color:${r.gm < 10 ? 'var(--danger)' : 'var(--success)'}">${r.gm.toFixed(1)}%</td><td>${r.gmP.toFixed(1)}%</td></tr>`;
             });
-
-            if (rows.length > 0) {
-                const firstRow = rows[0];
-                const fobPrice = parseFloat(firstRow.querySelector('[data-field="fob-price"]').value) || 0;
-                const packSize = parseFloat(firstRow.querySelector('[data-field="pack-size"]').value) || 1;
-
-                const freightPerUnit = totalFreightKRW / orderQty;
-                const insPerUnit = insuranceKRW / orderQty;
-                const fobUnitKRW = fobPrice * effectiveFX;
-                const cifUnit = fobUnitKRW + freightPerUnit + insPerUnit;
-                const dutyUnit = cifUnit * (dutyRate / 100);
-                const ancUnit = ancType === 'fixed' ? (ancFixed / orderQty) : cifUnit * (ancRate / 100);
-                const lcExVat = Math.round(cifUnit + dutyUnit + ancUnit);
-                const lcIncVat = Math.round(lcExVat * (1 + vatRate / 100));
-
-                const waterfallHTML = `
-                    <div class="waterfall">
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">FOB Price (per unit)</div>
-                            <div class="waterfall-value">₩${Math.round(fobUnitKRW).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">+ Freight</div>
-                            <div class="waterfall-value">₩${Math.round(freightPerUnit).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">+ Insurance</div>
-                            <div class="waterfall-value">₩${Math.round(insPerUnit).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label"><strong>= CIF</strong></div>
-                            <div class="waterfall-value"><strong>₩${Math.round(cifUnit).toLocaleString()}</strong></div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">+ Import Duty (${dutyRate}%)</div>
-                            <div class="waterfall-value">₩${Math.round(dutyUnit).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">+ Ancillary Cost (${ancType === 'fixed' ? '₩ Fixed' : ancRate + '%'})</div>
-                            <div class="waterfall-value">₩${Math.round(ancUnit).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label"><strong>= LC ex.VAT</strong></div>
-                            <div class="waterfall-value"><strong style="color:#2b6cb0;">₩${lcExVat.toLocaleString()}</strong></div>
-                            <div class="waterfall-arrow"></div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label">+ Import VAT (${vatRate}%, recoverable)</div>
-                            <div class="waterfall-value">₩${Math.round(lcIncVat - lcExVat).toLocaleString()}</div>
-                            <div class="waterfall-arrow">↓</div>
-                        </div>
-                        <div class="waterfall-row">
-                            <div class="waterfall-label"><strong>= LC inc.VAT</strong></div>
-                            <div class="waterfall-value"><strong style="color:#f56565;">₩${lcIncVat.toLocaleString()}</strong></div>
-                            <div class="waterfall-arrow"></div>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <strong>Note:</strong> LC ex.VAT (₩${lcExVat.toLocaleString()}) is the cost basis for Gross Margin calculation. Import VAT is recoverable.
-                    </div>
-                `;
-                document.getElementById('waterfall-display').innerHTML = waterfallHTML;
-                document.getElementById('waterfall-container').classList.remove('hidden');
-            }
-        }
-
-        function renderChannelSelection() {
-            const container = document.getElementById('channel-list-container');
-            container.innerHTML = '';
-            appState.channels.forEach((ch, idx) => {
-                const div = document.createElement('div');
-                div.className = 'section';
-                div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div class="section-title" style="margin-bottom: 0;">Channel ${idx + 1}</div>
-                        <button class="btn btn-danger" onclick="removeChannel(${idx})">Remove</button>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Category</label>
-                            <select data-channel-category data-idx="${idx}" onchange="updateChannelRetailers(this)">
-                                <option value="">-- Select --</option>
-                                ${Object.keys(CHANNEL_DATABASE).map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Retailer</label>
-                            <select data-channel-retailer data-idx="${idx}" onchange="updateChannelGP(${idx})">
-                                <option value="">-- Select --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>GP %</label>
-                            <input type="number" data-channel-gp data-idx="${idx}" step="0.01" onchange="saveChannelGP(${idx})">
-                        </div>
-                        <div class="form-group">
-                            <label>Trade % (Read-Only)</label>
-                            <div style="padding: 10px; background: #f7fafc; border-radius: 6px; border: 1px solid #cbd5e0;">
-                                <span data-channel-trade data-idx="${idx}" style="font-weight: 600; color: #2d3748;">--</span>%
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Add'l Logistics %</label>
-                            <input type="number" data-channel-logistics data-idx="${idx}" placeholder="0" step="0.01" value="0">
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-
-                if (ch.category) {
-                    div.querySelector('[data-channel-category]').value = ch.category;
-                    updateChannelRetailers(div.querySelector('[data-channel-category]'));
-                    setTimeout(() => {
-                        if (ch.retailer) div.querySelector('[data-channel-retailer]').value = ch.retailer;
-                        if (ch.gp) div.querySelector('[data-channel-gp]').value = ch.gp;
-                        if (ch.logistics) div.querySelector('[data-channel-logistics]').value = ch.logistics;
-                    }, 100);
-                }
-            });
-        }
-
-        function updateChannelRetailers(select) {
-            const idx = select.getAttribute('data-idx');
-            const cat = select.value;
-            const retailerSelect = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`);
-            retailerSelect.innerHTML = '<option value="">-- Select --</option>';
-
-            if (cat && CHANNEL_DATABASE[cat]) {
-                Object.keys(CHANNEL_DATABASE[cat]).forEach(retailer => {
-                    const opt = document.createElement('option');
-                    opt.value = retailer;
-                    opt.textContent = retailer;
-                    retailerSelect.appendChild(opt);
-                });
-            }
-        }
-
-        function updateChannelGP(idx) {
-            const cat = document.querySelector(`[data-channel-category][data-idx="${idx}"]`).value;
-            const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
-
-            if (cat && retailer && CHANNEL_DATABASE[cat][retailer]) {
-                const db = CHANNEL_DATABASE[cat][retailer];
-                document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value = db.gp;
-                document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent = db.trade;
-            }
-
-            saveChannelGP(idx);
-        }
-
-        function saveChannelGP(idx) {
-            const cat = document.querySelector(`[data-channel-category][data-idx="${idx}"]`).value;
-            const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
-            const gp = parseFloat(document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value) || 0;
-            const trade = parseFloat(document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent) || 0;
-            const logistics = parseFloat(document.querySelector(`[data-channel-logistics][data-idx="${idx}"]`).value) || 0;
-
-            appState.channels[idx] = { category: cat, retailer, gp, trade, logistics };
-        }
-
-        function addChannel() {
-            appState.channels.push({});
-            renderChannelSelection();
-        }
-
-        function removeChannel(idx) {
-            appState.channels.splice(idx, 1);
-            renderChannelSelection();
-        }
-
-        function buildLCDropdownOptions(selectedName) {
-            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
-            if (!lcSkus.length) return '<option value="">— (No LC data in Step 2) —</option>';
-            let opts = '<option value="">— Select —</option>';
-            lcSkus.forEach(s => {
-                const sel = s.productName === selectedName ? ' selected' : '';
-                opts += `<option value="${s.productName}"${sel}>${s.productName} (LC ₩${s.lcUnit.toLocaleString()})</option>`;
-            });
-            return opts;
-        }
-
-        function applyLCtoSKURow(row, productName) {
-            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
-            const found = lcSkus.find(s => s.productName === productName);
-            if (!found) return;
-            row.querySelector('[data-field="sku-name"]').value = found.productName;
-            row.querySelector('[data-field="lc-unit"]').value = found.lcUnit;
-        }
-
-        function importAllFromLC() {
-            // appState.landedCost.skus is already up-to-date (synced in goToStep(3))
-            const lcSkus = appState.landedCost.skus.filter(s => s.productName && s.lcUnit > 0);
-            if (!lcSkus.length) { alert('Please enter SKU details and FOB prices in Step 2 to calculate Landed Cost first.'); return; }
-            appState.skuParams = lcSkus.map(s => ({
-                skuName: s.productName,
-                lcUnit: s.lcUnit,
-                rsp: 0, packaging: 0, labor: 0, logistics: 0, logType: 'pct', vcPackSize: 1, vendor: 0, other: 0, foc: 0, mfgSupply: 0
-            }));
-            renderSKUTable();
-        }
-
-        function renderSKUTable() {
-            const tbody = document.getElementById('sku-tbody');
-            tbody.innerHTML = '';
-
-            // Show/hide the LC import bar based on whether LC SKUs exist
-            const lcBar = document.getElementById('lc-import-bar');
-            const hasLC = appState.landedCost.skus.some(s => s.productName && s.lcUnit > 0);
-            if (lcBar) lcBar.style.display = hasLC ? 'block' : 'none';
-
-            appState.skuParams.forEach((sku, idx) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="text-center">${idx + 1}</td>
-                    <td>
-                      <select data-field="lc-select" onchange="applyLCtoSKURow(this.closest('tr'), this.value)"
-                        style="width:100%;font-size:11px;padding:4px 4px;border:1px solid #bfdbfe;border-radius:5px;background:#f0f8ff;color:#1e40af;cursor:pointer">
-                        ${buildLCDropdownOptions(sku.skuName)}
-                      </select>
-                    </td>
-                    <td><input type="text" data-field="sku-name" placeholder="e.g., Whey Protein 500g" style="width:100%;"></td>
-                    <td><input type="number" data-field="rsp" placeholder="39900" step="1" style="width:100%;"></td>
-                    <td><input type="number" data-field="lc-unit" placeholder="auto↑" step="1"
-                        style="width:100%;background:#fffbeb;border-color:#f6ad55"
-                        oninput="updateEffLCDisplay(this.closest('tr'))"></td>
-                    <td style="min-width:72px;background:#fffef0;">
-                        <input type="number" data-field="vc-pack-size" placeholder="1" step="1" value="1" min="1"
-                            style="width:100%;background:#fffef0;border-color:#f6e05e;"
-                            oninput="updateEffLCDisplay(this.closest('tr'))">
-                        <div data-field="eff-lc-display" style="font-size:10px;color:#2b6cb0;font-weight:600;margin-top:2px;white-space:nowrap;"></div>
-                    </td>
-                    <td><input type="number" data-field="packaging" placeholder="0" step="1" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="labor" placeholder="0" step="1" value="0" style="width:100%;"></td>
-                    <td style="min-width:80px;">
-                        <select data-field="log-type" style="width:100%;font-size:11px;margin-bottom:3px;border:1px solid #cbd5e0;border-radius:4px;padding:2px 4px;background:#fff;">
-                            <option value="pct">% of Supply</option>
-                            <option value="fixed">Fixed ₩</option>
-                        </select>
-                        <input type="number" data-field="logistics" placeholder="0" step="0.01" value="0" style="width:100%;">
-                    </td>
-                    <td><input type="number" data-field="vendor" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="other" placeholder="0" step="1" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="foc" placeholder="0" step="0.01" value="0" style="width:100%;"></td>
-                    <td><input type="number" data-field="mfg-supply" placeholder="0" step="1" value="0" style="width:100%;"></td>
-                    <td class="text-center"><button class="btn btn-danger" onclick="removeSKURow(${idx})">x</button></td>
-                `;
-                tbody.appendChild(row);
-
-                if (sku.skuName) row.querySelector('[data-field="sku-name"]').value = sku.skuName;
-                if (sku.rsp) row.querySelector('[data-field="rsp"]').value = sku.rsp;
-                if (sku.lcUnit) row.querySelector('[data-field="lc-unit"]').value = sku.lcUnit;
-                if (sku.vcPackSize && sku.vcPackSize > 1) row.querySelector('[data-field="vc-pack-size"]').value = sku.vcPackSize;
-                updateEffLCDisplay(row);
-                if (sku.packaging) row.querySelector('[data-field="packaging"]').value = sku.packaging;
-                if (sku.labor) row.querySelector('[data-field="labor"]').value = sku.labor;
-                if (sku.logistics) row.querySelector('[data-field="logistics"]').value = sku.logistics;
-                if (sku.logType) row.querySelector('[data-field="log-type"]').value = sku.logType;
-                if (sku.vendor) row.querySelector('[data-field="vendor"]').value = sku.vendor;
-                if (sku.other) row.querySelector('[data-field="other"]').value = sku.other;
-                if (sku.foc) row.querySelector('[data-field="foc"]').value = sku.foc;
-                if (sku.mfgSupply) row.querySelector('[data-field="mfg-supply"]').value = sku.mfgSupply;
-            });
-        }
-
-        function addSKURow() {
-            appState.skuParams.push({});
-            renderSKUTable();
-        }
-
-        function removeSKURow(idx) {
-            appState.skuParams.splice(idx, 1);
-            renderSKUTable();
-        }
-
-        function collectSKUParams() {
-            const rows = document.querySelectorAll('#sku-tbody tr');
-            appState.skuParams = Array.from(rows).map(row => ({
-                skuName: row.querySelector('[data-field="sku-name"]').value,
-                rsp: parseFloat(row.querySelector('[data-field="rsp"]').value) || 0,
-                lcUnit: parseFloat(row.querySelector('[data-field="lc-unit"]').value) || 0,
-                vcPackSize: parseFloat(row.querySelector('[data-field="vc-pack-size"]').value) || 1,
-                packaging: parseFloat(row.querySelector('[data-field="packaging"]').value) || 0,
-                labor: parseFloat(row.querySelector('[data-field="labor"]').value) || 0,
-                logistics: parseFloat(row.querySelector('[data-field="logistics"]').value) || 0,
-                logType: row.querySelector('[data-field="log-type"]') ? row.querySelector('[data-field="log-type"]').value : 'pct',
-                vendor: parseFloat(row.querySelector('[data-field="vendor"]').value) || 0,
-                other: parseFloat(row.querySelector('[data-field="other"]').value) || 0,
-                foc: parseFloat(row.querySelector('[data-field="foc"]').value) || 0,
-                mfgSupply: parseFloat(row.querySelector('[data-field="mfg-supply"]').value) || 0
-            }));
-            return appState.skuParams;
-        }
-
-        function updatePromoDisplay() {
-            const isPromo = document.getElementById('promo-yes').checked;
-            document.getElementById('promo-section').classList.toggle('hidden', !isPromo);
-        }
-
-        function runAnalysis() {
-            appState.basicInfo = {
-                brandName: document.getElementById('brand-name').value,
-                originCountry: document.getElementById('origin-country').value,
-                analysisPurpose: document.getElementById('analysis-purpose').value,
-                analysisDate: document.getElementById('analysis-date').value,
-                memo: document.getElementById('memo').value
-            };
-
-            collectSKUParams();
-
-            appState.channels = [];
-            document.querySelectorAll('[data-channel-category]').forEach(cat => {
-                const idx = cat.getAttribute('data-idx');
-                const retailer = document.querySelector(`[data-channel-retailer][data-idx="${idx}"]`).value;
-                const gp = parseFloat(document.querySelector(`[data-channel-gp][data-idx="${idx}"]`).value) || 0;
-                const trade = parseFloat(document.querySelector(`[data-channel-trade][data-idx="${idx}"]`).textContent) || 0;
-                const logistics = parseFloat(document.querySelector(`[data-channel-logistics][data-idx="${idx}"]`).value) || 0;
-                if (cat.value && retailer) {
-                    appState.channels.push({ category: cat.value, retailer, gp, trade, logistics });
-                }
-            });
-
-            appState.promotion = {
-                active: document.getElementById('promo-yes').checked,
-                eventName: document.getElementById('event-name').value,
-                eventPeriod: document.getElementById('event-period').value,
-                discountRate: parseFloat(document.getElementById('discount-rate').value) || 0,
-                channelSupportRate: parseFloat(document.getElementById('channel-support-rate').value) || 0
-            };
-
-            const results = calculateResults();
-            appState.results = results;
-            renderResults(results);
             goToStep(5);
         }
 
-        function calculateResults() {
-            const results = [];
-
-            appState.channels.forEach((channel) => {
-                appState.skuParams.forEach((sku) => {
-                    if (!sku.skuName || !sku.rsp || !sku.lcUnit) return;
-
-                    const rsp = sku.rsp;
-                    const rspExVat = rsp / 1.1;
-                    const chLogRate = channel.logistics / 100;
-                    const supplyPrice = Math.round(rspExVat * (1 - channel.gp / 100 - chLogRate));
-
-                    const vcPack = sku.vcPackSize || 1;
-                    const effectiveLcUnit = Math.round(sku.lcUnit * vcPack);  // multiply LC by sell pack quantity
-
-                    const logAmt = sku.logType === 'fixed' ? sku.logistics : supplyPrice * (sku.logistics / 100);
-                    const vendorAmt = supplyPrice * (sku.vendor / 100);
-                    const focAmt = sku.mfgSupply * (sku.foc / 100);
-                    const tac = Math.round(effectiveLcUnit + sku.packaging + sku.labor + logAmt + sku.other + vendorAmt - focAmt);
-
-                    const grossRevenue = supplyPrice - tac;
-                    const gm = supplyPrice > 0 ? (grossRevenue / supplyPrice) * 100 : 0;
-
-                    const tradeAmt = supplyPrice * (channel.trade / 100);
-                    const grossRevenueAfterTrade = grossRevenue - tradeAmt;
-                    const gmAfterTrade = supplyPrice > 0 ? (grossRevenueAfterTrade / supplyPrice) * 100 : 0;
-
-                    results.push({
-                        channel: channel.category,
-                        retailer: channel.retailer,
-                        skuName: sku.skuName,
-                        rsp,
-                        rspExVat,
-                        supplyPrice,
-                        gpRate: channel.gp / 100,
-                        tradeRate: channel.trade / 100,
-                        chLogRate,
-                        gpAmt: Math.round(rspExVat * (channel.gp / 100)),
-                        logAmt: Math.round(logAmt),
-                        logType: sku.logType || 'pct',
-                        logInput: sku.logistics,
-                        vendorAmt: Math.round(vendorAmt),
-                        focAmt: Math.round(focAmt),
-                        lcUnit: effectiveLcUnit,
-                        lcUnitRaw: sku.lcUnit,
-                        vcPack,
-                        packaging: sku.packaging,
-                        labor: sku.labor,
-                        other: sku.other,
-                        tac,
-                        grossRevenue,
-                        gm,
-                        tradeAmt: Math.round(tradeAmt),
-                        gmAfterTrade,
-                        normal: true
-                    });
-
-                    if (appState.promotion.active && appState.promotion.discountRate > 0) {
-                        const totalDisc = rsp * (appState.promotion.discountRate / 100);
-                        const ourBurden = totalDisc * (1 - appState.promotion.channelSupportRate / 100);
-                        const promoSupply = Math.round(supplyPrice - ourBurden);
-
-                        const promoLogAmt = sku.logType === 'fixed' ? sku.logistics : promoSupply * (sku.logistics / 100);
-                        const promoVendorAmt = promoSupply * (sku.vendor / 100);
-                        const promoTac = Math.round(effectiveLcUnit + sku.packaging + sku.labor + promoLogAmt + sku.other + promoVendorAmt - focAmt);
-
-                        const promoRevenue = promoSupply - promoTac;
-                        const promoGm = promoSupply > 0 ? (promoRevenue / promoSupply) * 100 : 0;
-
-                        const promoTradeAmt = promoSupply * (channel.trade / 100);
-                        const promoRevenueAfterTrade = promoRevenue - promoTradeAmt;
-                        const promoGmAfterTrade = promoSupply > 0 ? (promoRevenueAfterTrade / promoSupply) * 100 : 0;
-
-                        results.push({
-                            channel: channel.category,
-                            retailer: channel.retailer,
-                            skuName: sku.skuName,
-                            rsp: rsp * (1 - appState.promotion.discountRate / 100),
-                            rspExVat: rsp * (1 - appState.promotion.discountRate / 100) / 1.1,
-                            supplyPrice: promoSupply,
-                            gpRate: channel.gp / 100,
-                            tradeRate: channel.trade / 100,
-                            chLogRate,
-                            gpAmt: Math.round(rspExVat * (channel.gp / 100)),
-                            logAmt: Math.round(promoLogAmt),
-                            logType: sku.logType || 'pct',
-                            logInput: sku.logistics,
-                            vendorAmt: Math.round(promoVendorAmt),
-                            focAmt: Math.round(focAmt),
-                            lcUnit: effectiveLcUnit,
-                            lcUnitRaw: sku.lcUnit,
-                            vcPack,
-                            packaging: sku.packaging,
-                            labor: sku.labor,
-                            other: sku.other,
-                            tac: promoTac,
-                            grossRevenue: promoRevenue,
-                            gm: promoGm,
-                            tradeAmt: Math.round(promoTradeAmt),
-                            gmAfterTrade: promoGmAfterTrade,
-                            normal: false
-                        });
-                    }
-                });
-            });
-
-            return results;
+        function loadSampleData() {
+            db.skus = [{ name: 'Premium Collagen 355ml', hs: '2202.99', fob: 0.72, tariff: 8, pack: 24, ads: 5, log: 3, pkg: 400, vendor: 2, rsp: 67200 }];
+            db.channels = [{ name: 'GS25 (CVS)', ...CHANNEL_PRESETS['GS25 (CVS)'] }];
+            renderAll(); save();
         }
 
-        function renderResults(results) {
-            const channels = appState.channels.map(ch => `${ch.category}: ${ch.retailer}`).join(' | ');
-            const headerHTML = `
-                <strong>Date:</strong> ${appState.basicInfo.analysisDate} |
-                <strong>Brand:</strong> ${appState.basicInfo.brandName} |
-                <strong>Purpose:</strong> ${appState.basicInfo.analysisPurpose}<br>
-                <strong>Channels:</strong> ${channels}
-            `;
-            document.getElementById('results-header').innerHTML = headerHTML;
-
-            // Update print-only meta line
-            const printMeta = document.getElementById('print-meta');
-            if (printMeta) {
-                printMeta.innerHTML = `<strong>Brand:</strong> ${appState.basicInfo.brandName} &nbsp;|&nbsp; <strong>Date:</strong> ${appState.basicInfo.analysisDate} &nbsp;|&nbsp; <strong>Channels:</strong> ${channels}`;
-            }
-
-            const container = document.getElementById('results-container');
-            container.innerHTML = '';
-
-            results.forEach((res) => {
-                const card = document.createElement('div');
-                card.className = 'sku-result' + (res.normal ? '' : ' sku-result-promo');
-
-                const gmPct = res.gm.toFixed(2);
-                const gmAfterTradePct = res.gmAfterTrade.toFixed(2);
-
-                let headerText = `${res.skuName} | ${res.retailer}`;
-                if (!res.normal) {
-                    headerText += ` [${appState.promotion.eventName || 'Promotion'}]`;
-                }
-
-                card.innerHTML = `
-                    <div class="sku-result-header">${headerText}</div>
-                    <div class="sku-result-body">
-                        <div class="sku-result-column">
-                            <div class="sku-result-column-title">Revenue Side</div>
-                            <div class="sku-result-line">
-                                <span>Consumer Price (RSP)</span>
-                                <span class="sku-result-line-value">₩${res.rsp.toLocaleString()}</span>
-                            </div>
-                            <div class="sku-result-line">
-                                <span>RSP Ex.VAT</span>
-                                <span class="sku-result-line-value">₩${Math.round(res.rspExVat).toLocaleString()}</span>
-                            </div>
-                            <div class="sku-result-line">
-                                <span>⟹ Channel GP (${(res.gpRate*100).toFixed(1)}%)</span>
-                                <span class="sku-result-line-value">-₩${res.gpAmt.toLocaleString()}</span>
-                            </div>
-                            ${res.chLogRate > 0 ? `
-                            <div class="sku-result-line">
-                                <span>⟹ Ch. Logistics (${(res.chLogRate*100).toFixed(1)}%)</span>
-                                <span class="sku-result-line-value">-₩${Math.round(res.rspExVat * res.chLogRate).toLocaleString()}</span>
-                            </div>` : ''}
-                            <div class="sku-result-divider"></div>
-                            <div class="sku-result-line sku-result-total">
-                                <span>Supply Price</span>
-                                <span>₩${res.supplyPrice.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div class="sku-result-column">
-                            <div class="sku-result-column-title">Cost Side / TAC</div>
-                            <div class="sku-result-line">
-                                <span>Landed Cost${res.vcPack > 1 ? ` <span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 4px;">×${res.vcPack}</span>` : ''}</span>
-                                <span class="sku-result-line-value">₩${res.lcUnit.toLocaleString()}</span>
-                            </div>
-                            <div class="sku-result-line">
-                                <span>Packaging</span>
-                                <span class="sku-result-line-value">₩${res.packaging.toLocaleString()}</span>
-                            </div>
-                            <div class="sku-result-line">
-                                <span>Labor</span>
-                                <span class="sku-result-line-value">₩${res.labor.toLocaleString()}</span>
-                            </div>
-                            ${res.logAmt > 0 ? `
-                                <div class="sku-result-line">
-                                    <span>Logistics (${res.logType === 'fixed' ? '₩ Fixed' : res.logInput + '%'})</span>
-                                    <span class="sku-result-line-value">₩${res.logAmt.toLocaleString()}</span>
-                                </div>
-                            ` : ''}
-                            ${res.vendorAmt > 0 ? `
-                                <div class="sku-result-line">
-                                    <span>Vendor Fee</span>
-                                    <span class="sku-result-line-value">₩${res.vendorAmt.toLocaleString()}</span>
-                                </div>
-                            ` : ''}
-                            ${res.other > 0 ? `
-                                <div class="sku-result-line">
-                                    <span>Other</span>
-                                    <span class="sku-result-line-value">₩${res.other.toLocaleString()}</span>
-                                </div>
-                            ` : ''}
-                            ${res.focAmt > 0 ? `
-                                <div class="sku-result-line">
-                                    <span>FOC Rebate</span>
-                                    <span class="sku-result-line-value">-₩${res.focAmt.toLocaleString()}</span>
-                                </div>
-                            ` : ''}
-                            <div class="sku-result-divider"></div>
-                            <div class="sku-result-line sku-result-total">
-                                <span>TAC</span>
-                                <span>₩${res.tac.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div class="sku-result-column">
-                            <div class="gm-box">
-                                <div class="gm-box-label">Gross Margin</div>
-                                <div class="gm-box-value">${gmPct}%</div>
-                                <div style="border-top:1px solid rgba(255,255,255,0.3); margin:12px 0;"></div>
-                                <div class="gm-box-label">After Trade</div>
-                                <div style="font-size:20px;font-weight:700;color:#ff6b6b;margin:8px 0;">${gmAfterTradePct}%</div>
-                                <div class="gm-box-subtitle">Trade: -₩${res.tradeAmt.toLocaleString()}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            const summaryBody = document.getElementById('summary-tbody');
-            summaryBody.innerHTML = '';
-            results.filter(r => r.normal).forEach(res => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${res.channel}</td>
-                    <td>${res.retailer}</td>
-                    <td>${res.skuName}</td>
-                    <td class="text-right">₩${res.rsp.toLocaleString()}</td>
-                    <td class="text-right">₩${res.supplyPrice.toLocaleString()}</td>
-                    <td class="text-right">₩${res.lcUnit.toLocaleString()}${res.vcPack > 1 ? `<br><span style="font-size:9px;color:#92400e;">(×${res.vcPack})</span>` : ''}</td>
-                    <td class="text-right">₩${res.tac.toLocaleString()}</td>
-                    <td class="text-right">₩${res.grossRevenue.toLocaleString()}</td>
-                    <td class="text-right">${res.gm.toFixed(2)}%</td>
-                    <td class="text-right">${res.gmAfterTrade.toFixed(2)}%</td>
-                `;
-                summaryBody.appendChild(row);
-            });
-        }
-
-        function collectAllInputs() {
-            return {
-                basicInfo: {
-                    brandName: document.getElementById('brand-name').value,
-                    originCountry: document.getElementById('origin-country').value,
-                    analysisPurpose: document.getElementById('analysis-purpose').value,
-                    analysisDate: document.getElementById('analysis-date').value,
-                    memo: document.getElementById('memo').value
-                },
-                landedCost: {
-                    currency: document.getElementById('product-currency').value,
-                    incoterms: document.getElementById('incoterms').value,
-                    baseFX: document.getElementById('base-fx-rate').value,
-                    fxSpread: document.getElementById('fx-spread').value,
-                    freightAmount: document.getElementById('freight-amount').value,
-                    insuranceKRW: document.getElementById('insurance-krw').value,
-                    dutyRate: document.getElementById('duty-rate').value,
-                    vatRate: document.getElementById('vat-rate').value,
-                    ancType: document.getElementById('anc-type').value,
-                    ancRate: document.getElementById('ancillary-rate').value,
-                    ancFixed: document.getElementById('ancillary-fixed').value,
-                    orderQty: document.getElementById('order-qty').value,
-                    skus: appState.landedCost.skus
-                },
-                channels: appState.channels,
-                skuParams: appState.skuParams,
-                promotion: {
-                    active: document.getElementById('promo-yes').checked,
-                    eventName: document.getElementById('event-name').value,
-                    eventPeriod: document.getElementById('event-period').value,
-                    discountRate: document.getElementById('discount-rate').value,
-                    channelSupportRate: document.getElementById('channel-support-rate').value
-                }
-            };
-        }
-
-        function saveJSON() {
-            const state = collectAllInputs();
-            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'channel_analysis_' + new Date().toISOString().slice(0, 10) + '.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function restoreState(state) {
-            if (state.basicInfo) {
-                document.getElementById('brand-name').value = state.basicInfo.brandName || '';
-                document.getElementById('origin-country').value = state.basicInfo.originCountry || '';
-                document.getElementById('analysis-purpose').value = state.basicInfo.analysisPurpose || '';
-                document.getElementById('analysis-date').value = state.basicInfo.analysisDate || '';
-                document.getElementById('memo').value = state.basicInfo.memo || '';
-            }
-
-            if (state.landedCost) {
-                document.getElementById('product-currency').value = state.landedCost.currency || 'USD';
-                document.getElementById('incoterms').value = state.landedCost.incoterms || 'FOB';
-                document.getElementById('base-fx-rate').value = state.landedCost.baseFX || '';
-                document.getElementById('fx-spread').value = state.landedCost.fxSpread || '0';
-                document.getElementById('freight-amount').value = state.landedCost.freightAmount || '';
-                document.getElementById('insurance-krw').value = state.landedCost.insuranceKRW || '0';
-                document.getElementById('duty-rate').value = state.landedCost.dutyRate || '8';
-                document.getElementById('vat-rate').value = state.landedCost.vatRate || '10';
-                if (state.landedCost.ancType) {
-                    document.getElementById('anc-type').value = state.landedCost.ancType;
-                    toggleAncType();
-                }
-                document.getElementById('ancillary-rate').value = state.landedCost.ancRate || '3';
-                document.getElementById('ancillary-fixed').value = state.landedCost.ancFixed || '0';
-                document.getElementById('order-qty').value = state.landedCost.orderQty || '3000';
-
-                appState.landedCost.skus = state.landedCost.skus || [];
-                renderLCTable();
-            }
-
-            if (state.channels) {
-                appState.channels = state.channels;
-                renderChannelSelection();
-            }
-
-            if (state.skuParams) {
-                appState.skuParams = state.skuParams;
-                renderSKUTable();
-            }
-
-            if (state.promotion) {
-                if (state.promotion.active) {
-                    document.getElementById('promo-yes').checked = true;
-                } else {
-                    document.getElementById('promo-no').checked = true;
-                }
-                document.getElementById('event-name').value = state.promotion.eventName || '';
-                document.getElementById('event-period').value = state.promotion.eventPeriod || '';
-                document.getElementById('discount-rate').value = state.promotion.discountRate || '0';
-                document.getElementById('channel-support-rate').value = state.promotion.channelSupportRate || '0';
-                updatePromoDisplay();
-            }
-
-            updateFXPlaceholder();
-            updateIncotermDisplay();
-        }
-
-        function exportExcel() {
-            const wb = XLSX.utils.book_new();
-
-            const summaryData = [];
-            summaryData.push([
-                'Channel', 'Retailer', 'SKU', 'RSP (KRW)', 'Supply Price (KRW)', 'LC (KRW)',
-                'TAC (KRW)', 'Revenue (KRW)', 'GM %', 'GM % After Trade'
-            ]);
-
-            appState.results.filter(r => r.normal).forEach(res => {
-                summaryData.push([
-                    res.channel,
-                    res.retailer,
-                    res.skuName,
-                    res.rsp,
-                    res.supplyPrice,
-                    res.lcUnit,
-                    res.tac,
-                    res.grossRevenue,
-                    res.gm.toFixed(2),
-                    res.gmAfterTrade.toFixed(2)
-                ]);
-            });
-
-            const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-            XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
-
-            const detailsData = [];
-            detailsData.push([
-                'Channel', 'Retailer', 'SKU', 'RSP', 'Supply Price', 'LC', 'Packaging',
-                'Labor', 'Logistics', 'Vendor Fee', 'Other', 'FOC', 'TAC', 'Revenue', 'GM%'
-            ]);
-
-            appState.results.filter(r => r.normal).forEach(res => {
-                detailsData.push([
-                    res.channel,
-                    res.retailer,
-                    res.skuName,
-                    res.rsp,
-                    res.supplyPrice,
-                    res.lcUnit,
-                    res.packaging,
-                    res.labor,
-                    res.logAmt,
-                    res.vendorAmt,
-                    res.other,
-                    res.focAmt,
-                    res.tac,
-                    res.grossRevenue,
-                    res.gm.toFixed(2)
-                ]);
-            });
-
-            const ws2 = XLSX.utils.aoa_to_sheet(detailsData);
-            XLSX.utils.book_append_sheet(wb, ws2, 'Details');
-
-            XLSX.writeFile(wb, 'channel_analysis_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-        }
-
-        function newAnalysis() {
-            if (confirm('Start a new analysis? All current data will be cleared.')) {
-                appState = {
-                    basicInfo: {},
-                    landedCost: { skus: [] },
-                    channels: [],
-                    skuParams: [],
-                    promotion: {},
-                    results: null
-                };
-                document.getElementById('brand-name').value = '';
-                document.getElementById('origin-country').value = '';
-                document.getElementById('analysis-purpose').value = '';
-                document.getElementById('analysis-date').value = new Date().toISOString().split('T')[0];
-                document.getElementById('memo').value = '';
-                document.getElementById('promo-no').checked = true;
-                renderLCTable();
-                renderChannelSelection();
-                renderSKUTable();
-                updatePromoDisplay();
-                goToStep(1);
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', initApp);
-
-        // ── Test / simulation hooks (safe to expose) ──────────────────────
-        window.appState         = appState;
-        window.calculateResults = calculateResults;
+        function clearData() { if(confirm('Clear?')) { localStorage.removeItem('kvc_v52'); location.reload(); } }
+        function renderAll() { renderLCTable(); renderChannels(); renderCommercials(); }
+        window.onload = init;
     </script>
 </body>
 </html>
